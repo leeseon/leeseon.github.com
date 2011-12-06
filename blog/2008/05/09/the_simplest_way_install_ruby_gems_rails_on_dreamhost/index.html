@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>在DreamHost上安装Ruby、Gems与Rails的最简单方法 - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="其实这篇帖子是一年前就应该写的，当时在&quot;DreamHost&quot;:http://dreamhost.com 上折腾了几天才搞定mephisto，花了两周才搞定depot例子加上gettext汉化的过程。不过人总是好了伤疤忘了痛，而且事后想想也觉得没有什么可说，就不了了之了。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/2008/05/09/the_simplest_way_install_ruby_gems_rails_on_dreamhost">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">在DreamHost上安装Ruby、Gems与Rails的最简单方法</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-09T00:00:00+08:00" pubdate data-updated="true">May 9<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>其实这篇帖子是一年前就应该写的，当时在&quot;DreamHost&quot;:http://dreamhost.com 上折腾了几天才搞定mephisto，花了两周才搞定depot例子加上gettext汉化的过程。不过人总是好了伤疤忘了痛，而且事后想想也觉得没有什么可说，就不了了之了。而且如今DreamHost也开始进行mod_rails的beta测试了，想来现在才写是有点不太合时宜噢。不过最近又在DreamHost上部署了几个rails应用，不免有也心烦，于是有了旧事重提，朝花夕拾一下的想法。</p>
+<p>不过有一点要声明就是，其实在DreamHost上安装自己的gems其实是并不需要自己安装Ruby的，这两个过程是可以分开的，不过可能是我变态，总喜新厌旧，而且又狂有控制欲，那么大的空间为什么不装一个，而且还可以为ruby打上GC的补丁呢(其实也就是一想，补丁嘛我也没有打过:P，因为现在还用不上的)。</p>
+<p>Ruby装起来很简单，wget一个，解包，编译，安装，将之放入你的路径中就好，不过最好是先编译一份readline为好，以免以后执行script/console会出错，这个不多说，能google出一堆。</p>
+<p>Gems嘛，则需要你建一个本地的安装目录，通常为.gems，并告诉gems知道这个目录的存在，为了这一点你就需要有~目录下生成一个.gemrc的文件，并将你的目录告诉它就好了。当然你也可以如我一样，编译一份最新的rubygems，并将之放入你的查找路径之中就好。</p>
+<p>然后你还需要修改rails的disptch.fcgi文件，让它知道你的ruby与gems目录所在就好。当然其实你也可以使用&quot;GemsOnRails&quot;:http://gemsonrails.rubyforge.org/ 将所有用到的gems放在vendor下，这个就自然不需要自己安装Gems了(rmagick之类的除外)。</p>
+<p>好了，言归正传吧，何以言之我的方法最简单呢？其实是受了&quot;tobi&quot;:tobi 的启发，将所有的安装命令写成一个脚本然后直接执行它就好。不过与他不同的一点是，我在脚本上增加了GEM_HOME与PATH之类的添加与.gemrc文件的生成，真的是一站式搞定。如果你不太懂linux，那你有福了，当然如果你是linux高手，那就让我怡笑大方吧:(</p>
+<p>其实这条命令就是</p>
+<pre>
+<code>
+curl http://leeseon.com/private/allinstall.sh | sh
+</code>
+</pre>
+<p>而已，还算简单吧，嘿嘿</p>
+<p>不过在这之后你的dispatch.fcgi文件还需要将第一行改成,(dispatch.rb也最好改一下,虽然我发现不改也行)</p>
+<pre>
+<code>
+#!/home/your user name/local/bin/ruby
+</code>
+</pre>
+<p>并在require语名之前加上</p>
+<pre>
+<code>
+ENV['RAILS_ENV'] = 'production'
+ENV["GEM_HOME"]="/home/your user name/.gems"
+ENV["GEM_PATH"]="/home/your user name/.gems:/usr/lib/ruby/gems/1.8"
+</code>
+</pre>
+<p>OK,万事搞定，试试吧!</p>
+<p>注:我安装的是现在最新版本的ruby-1.8.6-p114与rubygems-1.1.1<br />
+这个以后会不定时的更新为最新版本</p>
+[tobi]http://blog.leetsoft.com/2005/06/17/installing-rails-made-easy</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-09T00:00:00+08:00" pubdate data-updated="true">May 9<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://leeseon.github.com/blog/2008/05/09/the_simplest_way_install_ruby_gems_rails_on_dreamhost/" data-via="" data-counturl="http://leeseon.github.com/blog/2008/05/09/the_simplest_way_install_ruby_gems_rails_on_dreamhost/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/05/03/haml_another_template_language/" title="Previous Post: Haml=>不错的选择">&laquo; Haml=>不错的选择</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/05/10/the_simplest_way_install_ruby_gems_rails_on_dreamhost_2/" title="next Post: 在DreamHost上安装Ruby、Gems与Rails的最简单方法之续">在DreamHost上安装Ruby、Gems与Rails的最简单方法之续 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

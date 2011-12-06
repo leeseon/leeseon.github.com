@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Capistrano配置及版本控制实践 - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="以前一直都将&quot;Capistrano&quot;:http://www.capify.org/ 的deploy.rb的文件放在SVN中，最近需要将代码共享给别人一同开发，这才发现了有一个问题，就是我的空间帐号与数据库的密码是不希望让人知道，毕竟知道的人越少越好嘛。
+而且最近做了一件傻事， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/2008/07/06/capistrano_deploy_and_source_control_practice">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Capistrano配置及版本控制实践</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-07-06T00:00:00+08:00" pubdate data-updated="true">Jul 6<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>以前一直都将&quot;Capistrano&quot;:http://www.capify.org/ 的deploy.rb的文件放在SVN中，最近需要将代码共享给别人一同开发，这才发现了有一个问题，就是我的空间帐号与数据库的密码是不希望让人知道，毕竟知道的人越少越好嘛。</p>
+<p>而且最近做了一件傻事，就是以前我都是将</p>
+<pre>
+<code>
+ENV["GEM_HOME"]="/home/yourusername/.gems" 
+ENV["GEM_PATH"]="/home/yourusername/.gems:/usr/lib/ruby/gems/1.8" 
+</code>
+</pre>
+<p>这样的配置放在dispatch.fcgi中，现在因为使用了&quot;Phusion Passenger&quot;:http://www.modrails.com/ (mod_rails)之后，这一段的内容放在了config/enviroment.rb之中，所以在windows上运行rake test时，出现了找不到gems的错误，一时没有想到了这样的问题，还费了半天的功夫:(</p>
+<p>于是鉴于这些问题，deploy.rb原则上不需要放在版本控制中的，而且database.yml与enviroment.rb也不需要放在版本控制之中，这些文件可以另外保存，与rails代码分开，放在另一个版本控制之中，并且放在share_dir中，在部署时拷贝到相应的目录之中。</p>
+<p>想做到这样，只需要在deploy.rb中增加一个任务</p>
+before &#8220;deploy:restart&#8221;, &#8216;deploy:copy_config&#8217;
+desc &quot;Copy the configuration file &quot;
+task :copy_config, :roles =&gt; :app, :except =&gt; { :no_release =&gt;  true  }   do
+run &#8220;cp -f #{shared_dir}/environment.rb #{current_path}/config/environment.rb&#8221;
+run &#8220;cp -f #{shared_dir}/database.yml #{current_path}/config/database.yml&#8221;
+end
+<p>即可</p></div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-07-06T00:00:00+08:00" pubdate data-updated="true">Jul 6<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://leeseon.github.com/blog/2008/07/06/capistrano_deploy_and_source_control_practice/" data-via="" data-counturl="http://leeseon.github.com/blog/2008/07/06/capistrano_deploy_and_source_control_practice/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/06/22/rails_ruby_community_faster_and_faster/" title="Previous Post: Rails/Ruby社区越来越快了">&laquo; Rails/Ruby社区越来越快了</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/07/06/new_dreamhost_ruby_and_rails_shell/" title="next Post: 更新了一下脚本">更新了一下脚本 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

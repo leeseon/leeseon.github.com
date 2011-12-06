@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>使用Capistrano在Dreamhost上部署mod_rails - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="虽然以前Capistrno 在windows下不能使用，但是自从2.0以后，其实就是可以使用的了。而且现在的2.3还加入了对git的支持。 而且从InfoQ 上得知Tom Copeland 已经使用Capistrano来更新mod_rails了,的确如它所说，只是给这个应用程序建立了一个“ &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/2008/05/19/capistrino-on-dreamhost-with-mod_rails">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">使用Capistrano在Dreamhost上部署mod_rails</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-19T00:00:00+08:00" pubdate data-updated="true">May 19<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>虽然以前<a href="http://capify.org/">Capistrno</a> 在windows下不能使用，但是自从2.0以后，其实就是可以使用的了。而且现在的2.3还加入了对git的支持。</p>
+
+
+	<p>而且从<a href="http://www.infoq.com/cn/news/2008/05/rails-deployment-roundup">InfoQ</a> 上得知<a href="http://tomcopeland.blogs.com/juniordeveloper/2008/05/mod_rails-and-c.html">Tom Copeland</a> 已经使用Capistrano来更新mod_rails了,的确如它所说，只是给这个应用程序建立了一个“restart.txt”文件，就会导致Passenger Phusion/mod_rails重启这个应用程序。的确很简单明了不是吗？</p>
+
+
+	<p>最终的deploy.rb文件看起来会象下面这样</p>
+
+<div class="jssc">
+  <ul style="margin-left: 39px;">
+    <li class="alt">
+      <div>
+        
+set&nbsp;:scm,&nbsp;:subversion      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:repository,&nbsp;        <span class="cstring">
+&quot;http://yoursvn/trunk&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+set&nbsp;:svn_username,&nbsp;        <span class="cstring">
+&quot;svnuser&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:svn_password,&nbsp;        <span class="cstring">
+&quot;svnpassword&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div style="background-color: rgb(255, 255, 153);">
+        
+role&nbsp;:app,&nbsp;        <span class="cstring">
+&quot;www.yourdomain.com&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+role&nbsp;:web,&nbsp;        <span class="cstring">
+&quot;www.yourdomain.com&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+role&nbsp;:db,&nbsp;&nbsp;        <span class="cstring">
+&quot;www.yourdomain.com&quot;        </span>
+,&nbsp;:primary&nbsp;=&gt;&nbsp;        <span class="ckeywords">
+true        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:deploy_to,&nbsp;        <span class="cstring">
+&quot;/home/yourusername/&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+set&nbsp;:user,&nbsp;        <span class="cstring">
+&quot;yourusername&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:password,&nbsp;        <span class="cstring">
+&quot;yourpassword&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:use_sudo,&nbsp;        <span class="ckeywords">
+false        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+namespace&nbsp;:deploy&nbsp;        <span class="ckeywords">
+do        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;desc&nbsp;        <span class="cstring">
+&quot;restarting&nbsp;mod_rails&nbsp;with&nbsp;restart.txt&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;task&nbsp;:restart,&nbsp;:roles&nbsp;=&gt;&nbsp;:app,&nbsp;:except&nbsp;=&gt;&nbsp;{&nbsp;:no_release&nbsp;=&gt;&nbsp;        <span class="ckeywords">
+true        </span>
+&nbsp;}&nbsp;        <span class="ckeywords">
+do        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;&nbsp;&nbsp;run&nbsp;        <span class="cstring">
+&quot;touch&nbsp;#{current_path}/tmp/restart.txt&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;end      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;[:start,&nbsp;:stop].each&nbsp;        <span class="ckeywords">
+do        </span>
+&nbsp;|t|      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;&nbsp;&nbsp;desc&nbsp;        <span class="cstring">
+&quot;#{t}&nbsp;task&nbsp;is&nbsp;a&nbsp;no-op&nbsp;with&nbsp;mod_rails&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;&nbsp;&nbsp;task&nbsp;t,&nbsp;:roles&nbsp;=&gt;&nbsp;:app&nbsp;        <span class="ckeywords">
+do        </span>
+&nbsp;;&nbsp;end      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;end      </div>
+    </li>
+    <li>
+      <div>
+        
+end      </div>
+    </li>
+  </ul>
+</div>
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-19T00:00:00+08:00" pubdate data-updated="true">May 19<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://leeseon.github.com/blog/2008/05/19/capistrino-on-dreamhost-with-mod_rails/" data-via="" data-counturl="http://leeseon.github.com/blog/2008/05/19/capistrino-on-dreamhost-with-mod_rails/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/05/18/mod_rails-on-dreamhost/" title="Previous Post: dreamhost真的开始支持mod_rails了">&laquo; dreamhost真的开始支持mod_rails了</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/05/19/rubinius_supports_rails/" title="next Post: Rubinius开始支持rails了">Rubinius开始支持rails了 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

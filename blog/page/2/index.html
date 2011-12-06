@@ -1,0 +1,623 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="自己写了一段发送邮件的客户端程序，一直运行良好。可是某天开始，程序发送能提示成功，但是一直接收不到，深感诧异。将笔记本带回家中，程序又运行良好。第二天上班，发现问题依旧。
+随决定使用最原始的telnet命令查看问题原因，命令如下 16:52:22 [rx] 220 XXX.com ESMTP &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/page/2">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/04/24/email_send_successed_but_never_get_it/">邮件发送提示成功，但是无法接收</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-04-24T00:00:00+08:00" pubdate data-updated="true">Apr 24<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>自己写了一段发送邮件的客户端程序，一直运行良好。可是某天开始，程序发送能提示成功，但是一直接收不到，深感诧异。将笔记本带回家中，程序又运行良好。第二天上班，发现问题依旧。</p>
+<p>随决定使用最原始的telnet命令查看问题原因，命令如下</p>
+<tm lang="shell">
+<p>16:52:22 [rx] 220 <span class="caps">XXX</span>.com <acronym title="EQManager V6.0"><span class="caps">ESMTP</span></acronym> <span class="caps">ESMTP</span><br />
+16:52:22 [tx] <span class="caps">EHLO</span> computer1<br />
+16:52:22 [rx] 250-<span class="caps">XXX</span>.com <acronym title="EQManager V6.0"><span class="caps">ESMTP</span></acronym><br />
+16:52:22 [rx] 250-<span class="caps">STARTTLS</span><br />
+16:52:22 [rx] 250-<span class="caps">AUTH</span> <span class="caps">LOGIN</span> <span class="caps">PLAIN</span><br />
+16:52:22 [rx] 250-<span class="caps">AUTH</span>=<span class="caps">LOGIN</span> <span class="caps">PLAIN</span><br />
+16:52:22 [rx] 250-<span class="caps">PIPELINING</span><br />
+16:52:22 [rx] 250-<span class="caps">SIZE</span> 25530692<br />
+16:52:22 [rx] 250 8BITMIME<br />
+16:52:22 [tx] <span class="caps">AUTH</span> <span class="caps">LOGIN</span><br />
+16:52:22 [rx] 334 VXNlcm5hbWU6<br />
+16:52:22 [tx] e===<br />
+16:52:22 [rx] 334 UGFzc3dvcmQ6<br />
+16:52:22 [tx] N===<br />
+16:52:22 [rx] 235 ok, go ahead (#2.0.0)<br />
+16:52:22 [tx] <span class="caps">MAIL</span> <span class="caps">FROM</span>: &lt;account@XXX.com&gt;<br />
+16:52:22 [rx] 250 ok<br />
+16:52:22 [tx] <span class="caps">RCPT</span> TO: &lt;account@sina.com&gt;<br />
+16:52:22 [rx] 250 ok<br />
+16:52:22 [tx] <span class="caps">DATA</span><br />
+16:52:22 [rx] 354 Send from Rising mail proxy<br />
+16:52:22 [tx] <br />
+.</p>
+</tm>
+<p>执行完DATA命令，发送结束符，然后等待从服务器的信息，等待足够长的时间后，系统提示超时。<br />
+邮件一直发送不成功。看到DATA命令紧跟着 Send from Rising mail proxy，猜测可能与瑞星<br />
+防毒软件有关，之后关闭了瑞星，再次发送，ok，一切正常，所有命令没有任何问题。DATA命令<br />
+也能返回响应，但是登录sina还是接受不到。考虑到网络延时，又等待了20分钟，还是接受不到。<br />
+至此黔驴技穷，无计可施了。遂放弃，回家休息了。</p>
+<p>第二日上班后，登录sina，一下接收了n多封信，至此我的问题解决。</p>
+<p>究其原因<br />
+1.确实是瑞星杀毒软件导致邮件接收不到。因为安装的是网络版，所以回家就关闭了瑞星，到公司<br />
+才打开，解释了为什么在家可以发送成功，而在公司不成功。<br />
+2.sina信箱使用的是免费信箱，上网查找，发现不止我一人，很多使用sina免费信箱的用户都抱怨<br />
+邮件接收延时大，夸张的需要隔一天才可以接收到，可能和他的服务器繁忙有关，当然也可能是不重视<br />
+免费的用户。</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/03/28/there_is_always_time_to_launch_your_dream/">总会有时间来实现你的梦想</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-03-28T00:00:00+08:00" pubdate data-updated="true">Mar 28<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><blockquote>
+<p>“I’d love to start a company / become a great programmer / write an awesome blog, but there’s just not enough time in the day!” Bullshit. There’s always enough time, you’re just not spending it right.</p>
+</blockquote>
+<p>看到了&quot;DHH&quot;:http://www.loudthinking.com/ 的这篇&quot;post&quot;:post 当时感触就很深，本想译出来偏不得闲，恰今天遇一事忆起且又有闲，试译一下，原文就很简单本不需译，纯当练手好玩尔;)<br />
+<blockquote><p>“I’d love to start a company / become a great programmer / write an awesome blog, but there’s just not enough time in the day!” Bullshit. There’s always enough time, you’re just not spending it right.</p></p>
+<p>Now that’s some tough love, but I’m sick and tired of hearing “no time” as an excuse for why you can’t be great. It really doesn’t take that much time to get started, but it does take wanting it really bad. Most people just doesn’t want it bad enough and protect their ego with the excuse of time.</p>
+<p>This excuse is particularly depressing when it comes from students. Oh, I have so many classes. Oh, I have so much home work. There’s simply no time to learn outside of school. Then you’re doing it wrong!</p>
+<p>Never let your schooling interfere with your education, someone clever once said. Being willing to sacrifice at the edges is one of the most important skills you’ll ever learn.</p>
+<p>I’ve received plenty of Bs and even Cs for classes that I was incredibly proud of because they came from hardly no time spent at all. Time that I could then spend on reading my own curriculum, starting my own projects, and running my own businesses.</p>
+<p>And I did. During my undergrad, I created Instiki, Rails, Basecamp, and got on the path to being a partner at 37signals. Do you think I could fit all that and still get straight As and have lots of time left over for playing World of Warcraft? No.</p>
+<p>If you want it bad enough, you’ll make the time, regardless of your other obligations. Don’t let yourself off the hook with excuses. It’s too easy and, to be honest, nobody cares on the other side.</p>
+<p>It’s entirely your responsibility to make your dreams come through.</p></blockquote>
+<p>“我非常希望开一家公司/成为一个伟大的程序员/写一篇令人惊叹博客，但是没有足够的时间！”屁话。总有足够的时间，你只是没有正确使用！</p>
+<p>爱之深责之切吧，现我已经十分厌倦听到以“没有时间”作为自己为何不足够强大的借口。不需要太多时间就可以开始，但这取决于是否真的非常想要。大多数人并不是真的足够想要，仅仅是拿时间作为自我开脱的借口而已。</p>
+<p>尤其是听到学生说出这个借口时，会特别令人沮丧。“噢，我有这么多课。噢，我有那么多的家庭工作。有根本没有时间学习的学校以外的东西。”你错了！</p>
+<p>绝不让学业干扰了您的教育，曾有智者如是说。为了取得优势情愿付出是你需要学习的最重要技能之一。</p>
+<p>我的成绩曾得过大量的B，甚至还有C，但我仍然为此非常自豪，因为我几乎没有时间管它们。当时我的时间都花在阅读自己的课程，开始自己的项目，并运行自己的业务上了。</p>
+<p>我做到了。在我大学阶段，我创建Instiki ，Rails，BaseCamp，并走上了37signals合伙人之路。那么你会认为我能搞定上面所说的这一切，并有很多时间来魔兽世界？No</p>
+<p>如果你真的非常想要，无论怎样你都会抽出时间。不要拿借口来开脱。这是太容易了，并坦率地说，别人鬼在乎你这些。</p>
+<p>让你梦想成真完全你自己的责任。</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/03/10/there_is_always_time_to_launch_your_dream_if_it_is_your_real_dream/">总会有时间来实现自己的梦想，如果那真的是你的梦想的话</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-03-10T00:00:00+08:00" pubdate data-updated="true">Mar 10<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>看来DHH是在厌倦了别人向他抱怨，或者是什么刺激之后吧，说出了一个真理，虽然是大白话，但是听上去还是让人不得不深思一番，这不，俺虽然也困得不行，也只好上来先发个post占个位先，等醒了之后再好好品读一下。志之</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/02/17/export_mysql_data_to_sqlite3_for_rails/">将mysql数据导入到sqlite中</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-02-17T00:00:00+08:00" pubdate data-updated="true">Feb 17<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>自&quot;rails&quot;:http://www.rubyonrails.org 2.0将默认配置的数据库改成&quot;sqlite&quot;:http://www.sqlite.org 之后，我才真的开始使用这个&quot;self-contained, serverless, zero-configuration, transactional&quot;小巧，轻便的嵌入式的数据库、、、以下省去 溢美之词n多字</p>
+<p>不对sqlite对我来说最大的好处就是不用安装与启动服务，完全就是一个绿色版，只要拷贝过来，放在路径之下就能直接使用了，而且数据库也就是一个文件也是可以随身携带的</p>
+<p>如果不喜欢二进制文件也可以将数据转成文本，命令如下：</p>
+<tm lang="shell">
+<p>sqlite3 dbfile.sqlite3 &#8220;.dump&#8221; &gt; sqlite3db.sql</p>
+</tm>
+<p>不过我倒是没有试过在生产环境中使用它，平时在开发与测试时才使用，因此需要将一些mysql中的数据导入到我本地的sqlite3中</p>
+<p>自然是先google之，看到一个比较直白的&quot;解决方案&quot;:solution 它使用mysqldump导出sql语句并从中仅grep(提取)出insert语句，然后在使用<br />
+<tm lang="shell"><br />
+rake db:create<br />
+rake db:migrate</p>
+</tm>
+<p>之后用<br />
+<tm lang="shell"><br />
+sqlite3 dbfile.sqlite3 &lt; backup.sql</p>
+</tm>
+<p>将数据导入到sqlite3中</p>
+<p>不过其中有一点小问题：正如文中所说，mysql与sqlite3的转义符并不一致，<code>除了需要将\'转成''(两个单引号)之外，还需要将"\r"(0x5c0x72)与"\n"(0x5c0x6e)转成\r(0x0d)\n(0x0a)，此外\"也是需要转成"(双引号)的</code></p>
+<p>并且文中的替换方法是使用编辑器手工替换的，这点与我懒惰的习惯实在是不符，还是用sed来自动化一下吧！最终拼成一个脚本如下：</p>
+<tm lang="shell">
+<p>#!/bin/sh<br />
+mysqldump  &#8212;opt &#8212;no-create-db &#8212;no-create-info &#8212;default-character-set=utf8 &#8212;extended-insert=0 -u user -ppassword database \<br />
+| grep &#8216;<span class="caps">INSERT</span>&#8217; \<br />
+| sed -e &#8220;s/&#92;\&#8216;/&#8217;&#8217;/g&#8221; -e &#8220;s/&#92;\r/\r/g&#8221; -e &#8220;s/&#92;\n/\n/g&#8221; -e &#8216;s/&#92;\&#8220;/&#8221;/g&#8217; &gt; backup.sql</p>
+</tm>
+<p>如果你需要每天将服务器上的数据备份并应用在日常的开发中的话，可以参考上次所写的&quot;DreamHost每日mysql数据库备份方案&quot;:prepost 将上面这段合并到&quot;Dreamhost&quot;:dreamhost 的cron任务中</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/02/14/an_interesting_unix_time_just_at_valentines_day/">有趣的情人节时间密码</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-02-14T00:00:00+08:00" pubdate data-updated="true">Feb 14<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><tm lang="ruby">
+<p>require &#8216;rubygems&#8217;<br />
+require &#8216;active_support&#8217;</p>
+<p>Time.at 1234567890 # =&gt; Sat Feb 14 07:31:30 +0800 2009</p>
+<p>Time.zone = &#8220;Beijing&#8221; # =&gt; &#8220;Beijing&#8221;</p>
+<p>Time.zone.at 1234567890 # =&gt; Sat, 14 Feb 2009 07:31:30 <span class="caps">CST</span> +08:00</p>
+</tm>
+<p>可惜今天一天都在加班，早上6:30才回，倒头就睡了，在不知不觉中就已经错过了这个有趣时间:(</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/01/24/daily_backup_dreamhost_mysql_database_to_gmail/">DreamHost每日mysql数据库备份方案</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-01-24T00:00:00+08:00" pubdate data-updated="true">Jan 24<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>因为&quot;DreamHost&quot;:dreamhost 本身就提供了数据库的备份功能，尤其是象我这样更新不多blog数据也不多:( 一般出了问题restore一下就行了。</p>
+<p>不过前几天我犯了一个相当低级的错误，执行了一次<br />
+<pre><code>rake db:reset</code></pre></p>
+<p>谁知&quot;DreamHost&quot;:dreamhost 居然只能在命令行中执行<br />
+<pre><code>drop database</code></pre><br />
+却不能执行<br />
+<pre><code>create database</code></pre></p>
+<p>再去找panel里的数据库还在，但是restore居然提示没有任何内容，也不知出了什么事，只好发邮件问support.,但是网页总不能总是空的啊，好在幸好前几天为&quot;移植一个WordPress下的theme&quot;:port_theme 导了一份数据出来，换了个数据改了database.yml就搞定了</p>
+<p>只好亡羊补牢google了一下，自然是有现成的方案的，只是因为我想使用gmail来作为接受邮箱，但是gmail会拒收tar.gz, zip之类的文件，我修改了一下使用rar来打包，脚本如下：</p>
+<tm lang="shell">
+<p>#!/bin/bash<br />
+cd /home/yourname/backups/ <br />
+mkdir mysql <br />
+suffix=$(date +%y%m%d)<br />
+mysqldump &#8212;opt &#8212;default-character-set=utf8 -uyourname -ppassword -h yourhost.com database | sed &#8220;s/&#92;\&#8216;/&#8217;&#8217;/g&#8221; &gt; mysql/database.$suffix.sql<br />
+rar a archives/mysql_backup.$suffix.rar -r mysql/*<br />
+rm -r mysql/<br />
+mutt youname@gmail.com -a /home/yourname/backups/archives/mysql_backup.$suffix.rar -s &#8220;MySQL Backup&#8221;</p>
+</tm>
+<p>其中，mysqldump之后需要加上 &#8212;default-character-set=utf8 而且再一个sed &#8220;s/&#92;\&#8216;/&#8217;&#8217;/g&#8221; 通道比较好，这样导出的文件会将\&#8217;替成&quot;看起来比较方便</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/01/02/port_inove_wordpress_theme_to_mephisto/">自己移植了一个比较喜欢的wordpress主题用用</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-01-02T00:00:00+08:00" pubdate data-updated="true">Jan 2<span>nd</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>一直垂涎于Wordpress有很多好看的theme可以用，mephisto这两年的更新与发展也太慢了，看来rails的blog系统，相对于PHP来说还真的有一些小众的感觉。</p>
+<p>等着别人port我看基本是没戏，自己动手吧，虽然不难，但是有一点啰嗦，加上我的CSS知识也很一般，好在做port这种事其实与CSS基本无关，对于mephisto来说，其实要了解的主要是liquid与mephisto自己的一点变量而已。</p>
+<p>截了以前的样子，留个记录吧</p>
+<p><a href="http://www.slide.com/s/Zm5xneBv1z8bWbV7FtDfAKCYPCJl5_u0?referrer=hlnk"><img src="http://widget.slide.com/rdr/1/1/1/W/250000000c9da7f3/1/231/z_ZiBIoh6T-vmw_b8qKm1ZZWrx3ijB2n.jpg" alt="免费无限存放图片在slide.com!" title="免费无限存放图片在slide.com!" /></a></p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/01/01/wishes_in_the_new_year/">新年新气象</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-01-01T00:00:00+08:00" pubdate data-updated="true">Jan 1<span>st</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>2008年混杂着奥运的狂喜与自然灾害及金融危机呼啸而过，时间真的是过的越来越快，果然是：”我觉察他去的匆匆了，伸出手遮挽时，他又从遮挽着的手边过去“。</p>
+<p>此去经年是我最爱在元旦时留下的标题，而今又是“流光容易把人抛，红了樱桃，绿了芭蕉“了、、、然掩而叹息亦不能改变我又老去了一岁，在过去的一年中我又一事无成的事实。</p>
+<p>看来历史总是重复的基本上也是对的吧，不过人总会不满足于现状，在回首看看逝去的一年，心中不由的生出的恐惧与懊恼，追悔不及自然是有的，但是后悔是不能解决问题的，真的问题是需要解决问题，让自己成长，能在自己曾经的时光废墟中立起来，也算是新年新气象吧。</p>
+<p>特此立酸文志之，只需要在明年的元旦再看时不再心中有悔，此愿足矣！</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/11/19/so_cool_apple_advertisement/">太酷的广告了</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-11-19T00:00:00+08:00" pubdate data-updated="true">Nov 19<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><object type="application/x-shockwave-flash" style="width:425px; height:344px;" data="http://www.youtube.com/v/No1MxAnHuJM">
+<param name="movie" value="http://www.youtube.com/v/No1MxAnHuJM" />
+</object>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/11/10/from_textmate_to_emacs/">从Textmate到Emacs</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-11-10T00:00:00+08:00" pubdate data-updated="true">Nov 10<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>虽然Textmate一直是俺的最爱，但是出了ruby及os x之外，使用Textmate有时成了一种奢望，就说rubinius吧，这个*nix only的项目，现在也没有办法在cgywin上编译通过，在我打过多处补丁之后，发现这几乎对我来说是一项不可能完成的任务。不太懂*nix下的线程与信号的说，这个以后俺再补补，争取出个windows上原生线程的port。</p>
+<p>为了在*nix（ubuntu与mac os x)下读读它，并跟踪一下它的运行，我只好祭出emacs了，好在它可以整合emacs code browser及cscope，而且还能同时使用图形化的gdb界面。看来Ｃ++还是用emacs好了。</p>
+<p>其实我也一直很叶公好龙滴，虽然早就耳闻emacs的好，但是在ubuntu下俺就用gedit来偷懒，dreamhost上用不太熟的vi来混混，windows上还是主要依赖于VS、notepad++，有时也拿intype来找一下textmate的感觉。</p>
+<p>最近又因为公司里不许安装Ｄ版，而且VS公司又不肯买，在这点的Jole测试上公司应该是零分的:( 还说是因为印度那边用VC++ Express一直都很好，而且因为金融危机的问题，公司不肯再在软件上投入更多的预算，真是服了公司的目光短浅及印度人的忍耐力、、、、</p>
+<p>不过我是被Visual Assist X给宠坏了，不让我使用alt+o, alt+shift+s, alt+shift+o我是没有办法习惯了,而且我曾经花美金买到绝版的ref++及现在refactor!等等的插件都再也办法用了:( 不能装插件的vc express是一个让我无法适应的IDE。</p>
+<p>好在emacs还有一个windows的版本，在配完cedet之后，与VAX相同的功能也都回来了，只是emacs下的重构功能我还没有试过，而且那个是要收费滴</p>
+<p>经过了几天与emacs的搏斗之后，才发现emacs的难学只是听起来吓人的，慢慢的，还不等你记住，你的手指也开始记住了它的习惯了。而且使用它与*nix下的工具合作起来真的是很爽的，而且这样你在三个平台之下都有了一个统一的IDE感觉真的很爽，不过不知为什么，我居然没有想过用eclipse与netbean呢？我也不知道，可能我天生爱受虐，或者喜欢虐键盘，总对用quicksilver与launchy调出一个emacs疯狂打上一些古怪组合键感觉良好。不知你是否有同好？呵呵</p></div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

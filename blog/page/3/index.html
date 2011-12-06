@@ -1,0 +1,1111 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="一直对Rubinius所宣称的“Ruby In Ruby”很以为然，而且龙书中之也提到一个语言成熟的标志之一就是能“自举”&#8211;即使用自已来实现自己。以此为标准，Fortran、Basic、Javascript、Perl、PHP之类应该都算是不举，而LISP、C/C++、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/page/3">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/10/05/rubinius-and-llvm-jit/">Rubinius与LLVM</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-10-05T00:00:00+08:00" pubdate data-updated="true">Oct 5<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>一直对<a href="http://rubini.us/">Rubinius</a>所宣称的“Ruby In Ruby”很以为然，而且龙书中之也提到一个语言成熟的标志之一就是能“自举”&#8211;即使用自已来实现自己。以此为标准，Fortran、Basic、Javascript、Perl、PHP之类应该都算是不举，而LISP、C/C++、Smalltalk早就是很举的，Python、Java与Ruby现在是半举，并在让自己摆脱ED的印象之中，而<a href="http://rubini.us/">Rubinius</a>自然是Rubyist的春药罗</p>
+<p>这两天读到<a href="http://blog.fallingsnow.net/2008/05/23/simple-vm-jit-with-llvm/">Simple VM JIT with LLVM</a> 觉得很是有趣，不过奇怪的是居然这个网站也被盾了，如果你从来没有tor过，或者gladder过，建议你赶紧找一个翻过墙去看看。不过顺便也谈谈我的读后感吧，算是学习笔记了。</p>
+<p>Rubinius与YARV一样是一个虚拟机(VM)，它如同Python一样，先将源代码编译成Bytecode文件，在执行时优先执行Bytecode。这样能提高ruby的执行效率。说到VM自然不能不说它的bc了，一个VM无非就是拿一些bc来执行了事而已，其实PC也是这样的，只是一个实一个虚而已。</p>
+<p>Evan为了举例说明，首先杜撰了一个足够tiny的VM：</p>
+<ul>
+<li>只操作整数</li> 
+<li>被编号的寄存器</li>  
+<li>只有三条指令</li>  
+<li>
+<ol>
+<li><b>0 - set(reg, val)</b>　将第reg号寄存器设为整数值val </li> 
+<li><strong>1 - add(result, reg, val)</strong>&nbsp; 将第reg寄存器与val相加，并将结果放入result寄存器 </li> 
+<li><b>2 - show(reg)</b> 将寄存器reg中的内容打印出来</li>
+</ol>
+</li>
+</ul>
+<p>因此下面这字节</p><pre>  [ 0, 0, 3,
+    1, 0, 0, 4,
+    2, 0 ]</pre>
+<p>就表明将3与4相加并打印出来这样一个简单的功能，结果嘛如果不出意思自然是7</p>
+<p>用C实现这个VM最平铺直叙的方法就是直接写就好了，如下</p><pre class="blackboard"><span class="Storage">void</span> add(<span class="Storage">int</span>* ops, <span class="Storage">int</span>* registers) {
+  registers[ops[<span class="Constant">1</span>]] = registers[ops[<span class="Constant">2</span>]] + ops[<span class="Constant">3</span>];
+}
+
+<span class="Storage">void</span> set(<span class="Storage">int</span>* ops, <span class="Storage">int</span>* registers) {
+  registers[ops[<span class="Constant">1</span>]] = ops[<span class="Constant">2</span>];
+}
+
+<span class="Storage">void</span> <span class="Entity">sh<span class="Entity">ow</span></span>(<span class="Storage">int</span>* ops, <span class="Storage">int</span>* registers) {
+  <span class="Support">printf</span>(<span class="String"><span class="String">"</span>=&gt; <span class="StringInterpolation">%d</span><span class="Constant">\n</span><span class="String">"</span></span>, registers[ops[<span class="Constant">1</span>]]);
+}
+
+<span class="Storage">void</span> run(<span class="Storage">int</span>* ops, <span class="Storage">int</span>* registers) {
+  <span class="Keyword">switch</span>(*ops) {
+  <span class="Keyword">case</span> <span class="Constant">0</span>:
+	set(ops, registers);
+	ops += <span class="Constant">3</span>;
+    <span class="Keyword">break</span>;
+  <span class="Keyword">case</span> <span class="Constant">1</span>:
+	add(ops, registers);
+	ops += <span class="Constant">4</span>;
+    <span class="Keyword">break</span>;
+  <span class="Keyword">case</span> <span class="Constant">2</span>:
+	show(ops, registers);
+    <span class="Keyword">return</span>;
+  }
+}
+</pre>
+<p>随后Evan还另给出一个去除switch的直接的不能再直接的版本：</p>
+<pre class="blackboard"><span class="Storage">void</span> <span class="Entity">my_progr<span class="Entity">am</span></span>() {
+  <span class="Storage">int</span> registers[<span class="Constant">2</span>] = {<span class="Constant">0</span>, <span class="Constant">0</span>};
+  <span class="Storage">int</span> program[<span class="Constant">10</span>] = [ <span class="Constant">0</span>, <span class="Constant">0</span>, <span class="Constant">3</span>,
+                      <span class="Constant">1</span>, <span class="Constant">0</span>, <span class="Constant">0</span>, <span class="Constant">4</span>,
+                      <span class="Constant">2</span>, <span class="Constant">0</span> ]
+
+  <span class="Storage">int</span>* ops = (<span class="Storage">int</span>*)program;
+
+  set(ops, registers);
+  ops += <span class="Constant">3</span>;
+  add(ops, registers);
+  ops += <span class="Constant">4</span>;
+  show(ops, registers);
+  ops += <span class="Constant">2</span>;
+}
+</pre>
+<p>其实两者的功能是一样的，唯一的区别是前者更通用一点，可以在运行时执行，而后者比较象使用Bytecode直接翻译过来的样子。</p>
+<p>而且的确是这样，处理这样将Bytecode执行的一种最最静态的方法，就是写一个bc的C代码生成器(C code emitter)，将bc一次解析并产生一个类似第二段代码后几句的c代码文件，然后编译执行即可。</p>
+<p>不过这种方法最大的缺点就是太静态了，所以的东西已经在编译时就定了，这当然不是Rubinius可以使用的方式，至于如第一段代码那样，一个更动态一点的方法，就是写一个解释器，在运行时解析代码并动态执行。其实这就有点类似YARV的方式。<br/>除此之外有没有别的什么方法还执行bc呢？自然是有的，而且早就有很多人使用过了，那就是JIT(Just-in-time compilation)嘛:　JIT是一个不那么纯编译也不那么纯解释的方法，bc在被执行前，先被转成目标机器上的原生指令，然后再执行，因为这一过程是即时的生成的，因此可以在其中增加一个优化的环节。而且因为代码是即时生成的，因此它可以对生成的代码做一些caching，所以它要比一句一句“忠实”执行的解释器快，而且因为JIT能获得更多的运行时信息，如CPU的架构及代码执行统计信息，因此能够生成一些CPU“特化”的代码及运行时的优化工作，所以JIT也是很有可能比静态编译要快的。</p>
+<p>其实说了这么多也不过是为了引入今天所要谈的主角&#8212;&#8211;<a href="http://llvm.org/">LLVM</a>: LLVM并不是一个编译器，而仅仅只是一个编译器的基础设施(infrastructure)，这个比较绕，其实它最有趣是提供了一套语言无关的中间层的优化与分析工具集。晕，其实这样说依然很绕:( 不过如果看一看Evan的例子之后可能会明白一些</p>
+<p>首先就算是JIT也是需要将Bytecode的语义，即set/add/show指令提供给LLVM滴，先将这三个函数放入一个ops.c文件中，再用到llvm-gcc工具了，它利用gcc的前端，将C代码转换成LLVM的bc文件</p>
+<p>命令如下</p>
+<p><code>llvm-gcc -emit-llvm -O3 -c ops.c</code></p>
+<p>这会生成一个ops.o的bc文件</p>
+<p>使用<code>llvm-dis &lt; ops.o</code>　命令查看，会看到与bc文件相对应的LLVM汇编指令</p>
+<p>&nbsp;</p><pre class="blackboard">@.<span class="Entity">str</span> <span class="Keyword">=</span> internal constant [<span class="Constant">7</span> x i8] c<span class="String"><span class="String">"</span>=&gt; %dA0<span class="String">"</span></span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+
+define void <span class="Variable"><span class="Variable">@</span>add</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) nounwind  {
+entry:
+	<span class="Keyword">%</span>tmp1 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">2</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp5		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp8 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp7, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp10 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">3</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp11 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp10, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp12 <span class="Keyword">=</span> add i32 <span class="Keyword">%</span>tmp11, <span class="Keyword">%</span>tmp8		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp14 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	store i32 <span class="Keyword">%</span>tmp12, i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp14, align <span class="Constant">4</span>
+	ret void
+}
+
+define void <span class="Variable"><span class="Variable">@</span>set</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) nounwind  {
+entry:
+	<span class="Keyword">%</span>tmp1 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">2</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	store i32 <span class="Keyword">%</span>tmp5, i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp7, align <span class="Constant">4</span>
+	ret void
+}
+
+declare i32 <span class="Variable"><span class="Variable">@</span>printf</span>(i8<span class="Keyword">*</span>, ...) nounwind 
+
+define void <span class="Variable"><span class="Variable">@</span>show</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) nounwind  {
+entry:
+	<span class="Keyword">%</span>tmp1 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7 <span class="Keyword">=</span> tail call i32 (i8<span class="Keyword">*</span>, ...)<span class="Keyword">*</span> <span class="Variable"><span class="Variable">@</span>printf</span>( i8<span class="Keyword">*</span> getelementptr ([<span class="Constant">7</span> x i8]<span class="Keyword">*</span> @.<span class="Entity">str</span>, i32 <span class="Constant">0</span>, i32 <span class="Constant">0</span>), i32 <span class="Keyword">%</span>tmp5 ) nounwind 		;  [<span class="Comment"><span class="Comment">#</span>uses=0]</span>
+	ret void
+}
+</pre>
+<p>无它，这个ops.o主要是拿来给LLVM使用的，在运行时生成相应的语义调用</p>
+<p>然后使用LLVM的C++ API来生成一段与第二段代码相应的LLVM代码</p>
+<p>&nbsp;</p><pre class="blackboard">Function* <span class="Entity">crea<span class="Entity">te</span></span>(Module** out) {
+  std::string error;
+  Module* jit;
+
+  <span class="Comment"><span class="Comment">//</span> Load in the bitcode file containing the functions for each</span>
+  <span class="Comment"><span class="Comment">//</span> bytecode operation.</span>
+  <span class="Keyword">if</span>(MemoryBuffer* buffer = MemoryBuffer::getFile(<span class="String"><span class="String">"</span>ops.o<span class="String">"</span></span>, &amp;error)) {
+    jit = ParseBitcodeFile(buffer, &amp;error);
+    <span class="Keyword">delete</span> buffer;
+  }
+
+  <span class="Comment"><span class="Comment">//</span> Pull out references to them.</span>
+  Function* set =  jit-&gt;getFunction(std::string(<span class="String"><span class="String">"</span>set<span class="String">"</span></span>));
+  Function* add =  jit-&gt;getFunction(std::string(<span class="String"><span class="String">"</span>add<span class="String">"</span></span>));
+  Function* show = jit-&gt;getFunction(std::string(<span class="String"><span class="String">"</span>show<span class="String">"</span></span>));
+
+  <span class="Comment"><span class="Comment">//</span> Now, begin building our new function, which calls the</span>
+  <span class="Comment"><span class="Comment">//</span> above functions.</span>
+  Function* body = cast&lt;Function&gt;(jit-&gt;getOrInsertFunction(<span class="String"><span class="String">"</span>body<span class="String">"</span></span>,
+        Type::VoidTy,
+        PointerType::getUnqual(Type::Int32Ty),
+        PointerType::getUnqual(Type::Int32Ty), (Type*)<span class="Constant">0</span>));
+
+  <span class="Comment"><span class="Comment">//</span> Our function will be passed the ops pointer and the</span>
+  <span class="Comment"><span class="Comment">//</span> registers pointer, just like before.</span>
+  Function::arg_iterator args = body-&gt;arg_begin();
+  Value* ops = args++;
+  ops-&gt;setName(<span class="String"><span class="String">"</span>ops<span class="String">"</span></span>);
+  Value* registers = args++;
+  registers-&gt;setName(<span class="String"><span class="String">"</span>registers<span class="String">"</span></span>);
+
+  BasicBlock *bb = BasicBlock::Create(<span class="String"><span class="String">"</span>entry<span class="String">"</span></span>, body);
+
+  <span class="Comment"><span class="Comment">//</span> Set up our arguments to be passed to set.</span>
+  std::vector&lt;Value*&gt; params;
+  params.push_back(ops);
+  params.push_back(registers);
+
+  <span class="Comment"><span class="Comment">//</span> Call out to set, passing ops and registers down</span>
+  CallInst* call = CallInst::Create(set, params.begin(), params.end(), <span class="String"><span class="String">"</span><span class="String">"</span></span>, bb);
+  ConstantInt* const_3 = ConstantInt::get(APInt(<span class="Constant">32</span>,  <span class="String"><span class="String">"</span>3<span class="String">"</span></span>, <span class="Constant">10</span>));
+  ConstantInt* const_4 = ConstantInt::get(APInt(<span class="Constant">32</span>,  <span class="String"><span class="String">"</span>4<span class="String">"</span></span>, <span class="Constant">10</span>));
+
+  <span class="Comment"><span class="Comment">//</span> add 3 to the ops pointer.</span>
+  GetElementPtrInst* ptr1 = GetElementPtrInst::Create(ops, const_3, <span class="String"><span class="String">"</span>tmp3<span class="String">"</span></span>, bb);
+
+  <span class="Comment"><span class="Comment">//</span> Setup and call add, notice we pass down the updated ops pointer</span>
+  <span class="Comment"><span class="Comment">//</span> rather than the original, so that we've moved down.</span>
+  std::vector&lt;Value*&gt; params2;
+  params2.push_back(ptr1);
+  params2.push_back(registers);
+  CallInst* call2 = CallInst::Create(add, params2.begin(), params2.end(), <span class="String"><span class="String">"</span><span class="String">"</span></span>, bb);
+
+  <span class="Comment"><span class="Comment">//</span> Push the ops pointer down another 4.</span>
+  GetElementPtrInst* ptr2 = GetElementPtrInst::Create(ops, const_4, <span class="String"><span class="String">"</span>tmp3<span class="String">"</span></span>, bb);
+
+  <span class="Comment"><span class="Comment">//</span> Setup and call show.</span>
+  std::vector&lt;Value*&gt; params3;
+  params3.push_back(ptr2);
+  params3.push_back(registers);
+  CallInst* call3 = CallInst::Create(show, params3.begin(), params3.end(), <span class="String"><span class="String">"</span><span class="String">"</span></span>, bb);
+
+  <span class="Comment"><span class="Comment">//</span> And we're done!</span>
+  ReturnInst::Create(bb);
+
+  *out = jit;
+  <span class="Keyword">return</span> body;
+}
+
+</pre>
+<p>然后调用之</p><pre class="blackboard"><span class="Storage">int</span> <span class="Entity">ma<span class="Entity">in</span></span>() {
+  <span class="Comment"><span class="Comment">//</span> The registers.</span>
+  <span class="Storage">int</span> registers[<span class="Constant">2</span>] = {<span class="Constant">0</span>, <span class="Constant">0</span>};
+
+  <span class="Comment"><span class="Comment">//</span> Our program.</span>
+  <span class="Storage">int</span> program[<span class="Constant">20</span>] = {<span class="Constant">0</span>, <span class="Constant">0</span>, <span class="Constant">3</span>,
+                     <span class="Constant">1</span>, <span class="Constant">0</span>, <span class="Constant">0</span>, <span class="Constant">4</span>,
+                     <span class="Constant">2</span>, <span class="Constant">0</span>};
+
+  <span class="Storage">int</span>* ops = (<span class="Storage">int</span>*)program;
+
+  <span class="Comment"><span class="Comment">//</span> Create our function and give us the Module and Function back.</span>
+  Module* jit;
+  Function* func = create(&amp;jit);
+
+  <span class="Comment"><span class="Comment">//</span> Add in optimizations. These were taken from a list that 'opt', LLVMs optimization tool, uses.</span>
+  PassManager p;
+
+  <span class="Comment"><span class="Comment">/*</span> Comment out optimize</span>
+<span class="Comment">  p.add(new TargetData(jit));</span>
+<span class="Comment">  p.add(createVerifierPass());</span>
+<span class="Comment">  p.add(createLowerSetJmpPass());</span>
+<span class="Comment">  p.add(createRaiseAllocationsPass());</span>
+<span class="Comment">  p.add(createCFGSimplificationPass());</span>
+<span class="Comment">  p.add(createPromoteMemoryToRegisterPass());</span>
+<span class="Comment">  p.add(createGlobalOptimizerPass());</span>
+<span class="Comment">  p.add(createGlobalDCEPass());</span>
+<span class="Comment">  p.add(createFunctionInliningPass());</span>
+<span class="Comment">  <span class="Comment">*/</span></span>
+
+  <span class="Comment"><span class="Comment">//</span> Run these optimizations on our Module</span>
+  p.run(*jit);
+
+  <span class="Comment"><span class="Comment">//</span> Setup for JIT</span>
+  ExistingModuleProvider* mp = <span class="Keyword">new</span> ExistingModuleProvider(jit);
+  ExecutionEngine* engine = ExecutionEngine::create(mp);
+
+  <span class="Comment"><span class="Comment">//</span> Show us what we've created!</span>
+  std::cout &lt;&lt; <span class="String"><span class="String">"</span>Created</span>
+<span class="String"><span class="String">"</span></span> &lt;&lt; *jit;
+
+  <span class="Comment"><span class="Comment">//</span> Have our function JIT'd into machine code and return. We cast it to a particular C function pointer signature so we can call in nicely.</span>
+  <span class="Storage">void</span> (*fp)(<span class="Storage">int</span>*, <span class="Storage">int</span>*) = (<span class="Storage">void</span> (*)(<span class="Storage">int</span>*, <span class="Storage">int</span>*))engine-&gt;getPointerToFunction(func);
+
+  <span class="Comment"><span class="Comment">//</span> Call what we've created!</span>
+  fp(ops, registers);
+}
+</pre>
+<p>最后的结果会是这样</p>
+<pre class="blackboard"><span class="Keyword">&lt;</span>snip same <span class="Variable">LLVM</span> as before<span class="Keyword">&gt;</span>
+
+define void <span class="Variable"><span class="Variable">@</span>body</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) {
+entry:
+call void <span class="Variable"><span class="Variable">@</span>set</span>( i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers )
+<span class="Keyword">%</span>tmp3 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">3</span> ;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+call void <span class="Variable"><span class="Variable">@</span>add</span>( i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp3, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers )
+<span class="Keyword">%</span>tmp31 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">4</span> ;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+call void <span class="Variable"><span class="Variable">@</span>show</span>( i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp31, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers )
+ret void
+}
+=&gt; <span class="Constant">7</span>
+</pre>
+<p>bc被执行了，不是吗？而且上面的那个boby就如同是<span class="Entity">my_progr<span class="Entity">am最后几行代码最直白的翻译，不同这处只是它是用API来产生的而已。</span></span></p>
+<p><span class="Entity"><span class="Entity">不过等等，最有趣的在后面，如果将LLVM的优化功能全部打开了之后，我们能得到什么？</span></span></p>
+<p><span class="Entity"><span class="Entity"></span></span>&nbsp;</p><pre class="blackboard">define void <span class="Variable"><span class="Variable">@</span>body</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) {
+entry:
+	<span class="Keyword">%</span>tmp1.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2.<span class="Entity">i</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1.<span class="Entity">i</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">2</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5.<span class="Entity">i</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4.<span class="Entity">i</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2.<span class="Entity">i</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	store i32 <span class="Keyword">%</span>tmp5.<span class="Entity">i</span>, i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp7.<span class="Entity">i</span>, align <span class="Constant">4</span>
+	<span class="Keyword">%</span>tmp3 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">3</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=3]</span>
+	<span class="Keyword">%</span>tmp1.<span class="Entity">i7</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp3, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2.<span class="Entity">i8</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1.<span class="Entity">i7</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4.<span class="Entity">i9</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp3, i32 <span class="Constant">2</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5.<span class="Entity">i10</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4.<span class="Entity">i9</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7.<span class="Entity">i11</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp5.<span class="Entity">i10</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp8.<span class="Entity">i</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp7.<span class="Entity">i11</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp10.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp3, i32 <span class="Constant">3</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp11.<span class="Entity">i</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp10.<span class="Entity">i</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp12.<span class="Entity">i</span> <span class="Keyword">=</span> add i32 <span class="Keyword">%</span>tmp11.<span class="Entity">i</span>, <span class="Keyword">%</span>tmp8.<span class="Entity">i</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp14.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2.<span class="Entity">i8</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	store i32 <span class="Keyword">%</span>tmp12.<span class="Entity">i</span>, i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp14.<span class="Entity">i</span>, align <span class="Constant">4</span>
+	<span class="Keyword">%</span>tmp31 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp1.<span class="Entity">i2</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp31, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2.<span class="Entity">i3</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1.<span class="Entity">i2</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4.<span class="Entity">i4</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2.<span class="Entity">i3</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5.<span class="Entity">i5</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4.<span class="Entity">i4</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7.<span class="Entity">i6</span> <span class="Keyword">=</span> call i32 (i8<span class="Keyword">*</span>, ...)<span class="Keyword">*</span> <span class="Variable"><span class="Variable">@</span>printf</span>( i8<span class="Keyword">*</span> getelementptr ([<span class="Constant">7</span> x i8]<span class="Keyword">*</span> @.<span class="Entity">str</span>, i32 <span class="Constant">0</span>, i32 <span class="Constant">0</span>), i32 <span class="Keyword">%</span>tmp5.<span class="Entity">i5</span> ) nounwind 		;  [<span class="Comment"><span class="Comment">#</span>uses=0]</span>
+	ret void
+}
+=&gt; <span class="Constant">7</span>
+</pre>
+<p>&nbsp;</p>
+<p>对，函数被LLVM给Inline化了，强吧！Evan称之为使用核能做饭，呵呵。</p>
+<p>嗯，的确是很趣，那么我们从中又能学到什么呢？使用LLVM强大的中间层基础设施，可以为rubinius的bc执行带来强大的JIT功能。至于rubinius真的是怎样做到，让我读读rubinius的代码之后再接着谈吧:)</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/09/06/mephisto0-8_error_maybe_from_edge_rails/">mephisto0.8出错了:(</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-09-06T00:00:00+08:00" pubdate data-updated="true">Sep 6<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>好久没有写blog了，最近才发现游戏公司忙起来还真的不是一般的忙，现在对那著名的“对EA的血泪控诉”也开始是感同身受了啊，唉!</p>
+
+
+<p>好在最近闲下来了一点，而且发现自己的gmail里面堆满了从dreamhost发过来的Cron Daemon的错误提示，提示我mephisto的/admin出错了。</p>
+
+
+<p>本来没有当回事，估计是因为dreamhost的rails升级到2.1.0引起的，当时我使用mephisto0.8，因为正好系统中有rails 2.0.2一时偷懒没有将rails freeze起来，心想应该freeze一下就没有问题了。二话不说，开工，运行</p>
+<pre>
+<code>
+rake rails:freeze:gems VERSION=2.0.2
+</code>
+</pre>
+<p>本以为重启一下服务就能好了，谁知出了一堆错，提示我 &#8220;undefined method &#8216;install_gem_spec_stubs&#8217;&#8221;</p>
+
+<p>查了一下文档，不对啊，install_gem_spec_stubs可是rails2.1.0中的函数啊，怎么会出现在mephisto 0.8之中，怪啊，不过即然如此，拿2.0.2试试便知，运行</p>
+<pre>
+<code>
+rails _2.0.2_ testrails
+</code>
+</pre>
+<p>打开config/boot.rb看了看，根本不用比较工具就能发现mephisto0.8的文件中的确是多出一行，注掉即可</p>
+
+<pre class="blackboard">  <span class="Keyword">class</span> <span class="Entity">VendorBoot<span class="Superclass"> <span class="Superclass">&lt;</span> Boot</span></span>
+    <span class="Keyword">def</span> <span class="Entity">load_initializer</span>
+      <span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span><span class="String"><span class="String">#{</span><span class="Variable">RAILS_ROOT</span><span class="String">}</span></span>/vendor/rails/railties/lib/initializer<span class="String">&quot;</span></span>
+<span class="Comment">      <span class="Comment">#</span>Rails::Initializer.run(:install_gem_spec_stubs)</span>
+    <span class="Keyword">end</span>
+  <span class="Keyword">end</span>
+</pre>
+
+<p>想想，可能是因为使用edge rails来生成的mephisto 0.8的原始文件的吧</p>
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/09/06/dreamhost_promo_code_leeseon/">做下广告吧Promo Code LEESEON</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-09-06T00:00:00+08:00" pubdate data-updated="true">Sep 6<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>无意间发现&quot;DreamHost&quot;:dreamhost 最近在搞优惠活动，凡是在9月10号之前注册的用户，都能享受无限的(之前是500G)磁盘空间与无限的带宽(之前是5T)。呵呵，其实这当然是有一点噱头的成份在里面，毕竟500G与5T(每周都会涨的)我是根本没有用完过，不过如果你认为你一定能用完，或者你梦想远大，或者只为了YY，那你可以赶紧注册一个噢!</p>
+<p>当然当然最重要的就是，呵呵，使用我的PROMO CODE：*LEESEON* 噢，这个是能打折滴，以前是$97，现在也就只有$50了，看来老外滑头起来也是不差的</p>
+<p><a href="http://www.slide.com/s/7XR8siYX7j9pX-H9gIIpX48muIiuRz1-?referrer=hlnk"><img src="http://widget.slide.com/rdr/1/1/1/W/2500000003fc4baa/1/118/dGJLfAwY3D9FeEigRy1f-cnKep93ZREK.jpg" alt="免费无限存放图片在slide.com!" title="免费无限存放图片在slide.com!" /></a></p>
+<p>自然自然无利不起早嘛，听说使用我的Promo Code我是能赚钱滴&#8212;俺从来没有拿到过:(,不过还是要佩服一下这种有点象传销一般的病毒式商业运作方式</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/07/06/new_dreamhost_ruby_and_rails_shell/">更新了一下脚本</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-07-06T00:00:00+08:00" pubdate data-updated="true">Jul 6<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>自从&quot;上回&quot;:post 之后，ruby、rails与gems也都开始更新了，于是也更新了一下安装脚本，如下：</p>
+<div class="jssc"><ul style="margin-left: 39px;"><li class="alt"><div>mkdir ~/.gems</div><p></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><div>echo <span class="cchar">&#8216;export GEM_HOME=&#8220;$<span class="caps">HOME</span>/.gems&#8221;&#8217;</span> &gt;&gt; .bash_profile</p>
+<p></div></li><li class="alt"><div>echo <span class="cchar">&#8216;export GEM_PATH=&#8220;$GEM_HOME:/usr/lib/ruby/gems/1.8&#8221;&#8217;</span> &gt;&gt; .bash_profile</p>
+<p></div></li><li class="alt"><div>echo <span class="cchar">&#8216;export <span class="caps">PATH</span>=&#8220;$<span class="caps">HOME</span>/.gems/bin:$<span class="caps">PATH</span>&#8221;&#8217;</span> &gt;&gt; .bash_profile</p>
+<p></div></li><li class="alt"><div>echo <span class="cchar">&#8216;export <span class="caps">PATH</span>=&#8220;$<span class="caps">HOME</span>/local/bin:$<span class="caps">PATH</span>&#8221;&#8217;</span> &gt;&gt; .bash_profile</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><div>. ~/.bash_profile</p>
+<p></div></li><li class="alt"><div>echo $<span class="caps">PATH</span></p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><div>touch ~/.gemrc</p>
+<p></div></li><li class="alt"><div>echo gemhome:/home/$(whoami)/.gems &gt;&gt; ~/.gemrc</p>
+<p></div></li><li class="alt"><div>echo gempath: &gt;&gt; ~/.gemrc</p>
+<p></div></li><li class="alt"><div>echo -/home/$(whoami)/.gems &gt;&gt; ~/.gemrc</p>
+<p></div></li><li class="alt"><div>echo -/usr/lib/ruby/gems/1.8 &gt;&gt; ~/.gemrc</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># setup directories<br />
+</span></li><li class="alt"><div>mkdir -p ~/local/usr/src/ruby</p>
+<p></div></li><li class="alt"><div>cd ~/local/usr/src/ruby</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># Install readline<br />
+</span></li><li class="alt">wget <span class="htmlstring">ftp://ftp.cwru.edu/pub/bash/readline-5.2.tar.gz</span></p>
+<p></li><li class="alt"><div>tar zxvf readline-5.2.tar.gz</p>
+<p></div></li><li class="alt"><div>cd readline-5.2</p>
+<p></div></li><li class="alt"><div>./configure &#8212;prefix=$<span class="caps">HOME</span>/local</p>
+<p></div></li><li class="alt"><div>make</p>
+<p></div></li><li class="alt"><div>make install</p>
+<p></div></li><li class="alt"><div>cd ..</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># install ruby<br />
+</span></li><li class="alt">wget <span class="htmlstring">ftp://ftp.ruby-lang.org/pub/ruby/1.8/ruby-1.8.7-p22.tar.bz2</span></p>
+<p></li><li class="alt"><div>tar jxvf ruby-1.8.7-p22.tar.bz2</p>
+<p></div></li><li class="alt"><div>cd ruby-1.8.7-p22</p>
+<p></div></li><li class="alt"><div>./configure &#8212;prefix=$<span class="caps">HOME</span>/local &#8212;with-readline-dir=$<span class="caps">HOME</span>/local/</p>
+<p></div></li><li class="alt"><div>make</p>
+<p></div></li><li class="alt"><div>make install</p>
+<p></div></li><li class="alt"><div>cd ..</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># fix path<br />
+</span></li><li class="alt"><div>export <span class="caps">PATH</span>=$<span class="caps">HOME</span>/local/bin:$<span class="caps">PATH</span></p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># get rubygems<br />
+</span></li><li class="alt">wget <span class="htmlstring">http://rubyforge.org/frs/download.php/38646/rubygems-1.2.0.tgz</span></p>
+<p></li><li class="alt"><div>tar zxvf rubygems-1.2.0.tgz</p>
+<p></div></li><li class="alt"><div>cd rubygems-1.2.0</p>
+<p></div></li><li class="alt"><div>$<span class="caps">HOME</span>/local/bin/ruby setup.rb config &#8212;prefix=$<span class="caps">HOME</span>/local</p>
+<p></div></li><li class="alt"><div>$<span class="caps">HOME</span>/local/bin/ruby setup.rb setup</p>
+<p></div></li><li class="alt"><div>$<span class="caps">HOME</span>/local/bin/ruby setup.rb install</p>
+<p></div></li><li class="alt"><div>cd ..</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># Install <span class="caps">RAILS</span><br />
+</span></li><li class="alt"><div>gem install rails</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># Install FastCGI<br />
+</span></li><li class="alt">curl -O <span class="htmlstring">http://www.fastcgi.com/dist/fcgi-2.4.0.tar.gz</span></p>
+<p></li><li class="alt"><div>tar xzvf fcgi-2.4.0.tar.gz</p>
+<p></div></li><li class="alt"><div>cd fcgi-2.4.0</p>
+<p></div></li><li class="alt"><div>./configure &#8212;prefix=$<span class="caps">HOME</span>/local</p>
+<p></div></li><li class="alt"><div>make</p>
+<p></div></li><li class="alt"><div>make install</p>
+<p></div></li><li class="alt"><div>cd ..</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># Install FastCGI &amp; MySQL gem packages<br />
+</span></li><li class="alt"><div>gem install fcgi &#8212; &#8212;with-fcgi-dir=$<span class="caps">HOME</span>/local</p>
+<p></div></li><li class="alt"><div>gem install mysql &#8212; &#8212;with-mysql-config</p>
+<p></div></li><li class="alt"><span class="ccomment"># gem  update</span></li></ul></div></p>
+<p>关于脚本的解释可以看&quot;以前&quot;:post2 的说明，这次仅仅只是版本上的更新而已，不再多做说明</p>
+<p>文件依然放在&quot;http://leeseon.com/private/allinstall.sh&quot;:shell 处</p>
+<p>也同样可以使用</p>
+<pre>
+<code>
+curl http://leeseon.com/private/allinstall.sh | sh
+</code>
+</pre>
+<p>来执行，无它、、、</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/07/06/capistrano_deploy_and_source_control_practice/">Capistrano配置及版本控制实践</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-07-06T00:00:00+08:00" pubdate data-updated="true">Jul 6<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>以前一直都将&quot;Capistrano&quot;:http://www.capify.org/ 的deploy.rb的文件放在SVN中，最近需要将代码共享给别人一同开发，这才发现了有一个问题，就是我的空间帐号与数据库的密码是不希望让人知道，毕竟知道的人越少越好嘛。</p>
+<p>而且最近做了一件傻事，就是以前我都是将</p>
+<pre>
+<code>
+ENV["GEM_HOME"]="/home/yourusername/.gems" 
+ENV["GEM_PATH"]="/home/yourusername/.gems:/usr/lib/ruby/gems/1.8" 
+</code>
+</pre>
+<p>这样的配置放在dispatch.fcgi中，现在因为使用了&quot;Phusion Passenger&quot;:http://www.modrails.com/ (mod_rails)之后，这一段的内容放在了config/enviroment.rb之中，所以在windows上运行rake test时，出现了找不到gems的错误，一时没有想到了这样的问题，还费了半天的功夫:(</p>
+<p>于是鉴于这些问题，deploy.rb原则上不需要放在版本控制中的，而且database.yml与enviroment.rb也不需要放在版本控制之中，这些文件可以另外保存，与rails代码分开，放在另一个版本控制之中，并且放在share_dir中，在部署时拷贝到相应的目录之中。</p>
+<p>想做到这样，只需要在deploy.rb中增加一个任务</p>
+before &#8220;deploy:restart&#8221;, &#8216;deploy:copy_config&#8217;
+desc &quot;Copy the configuration file &quot;
+task :copy_config, :roles =&gt; :app, :except =&gt; { :no_release =&gt;  true  }   do
+run &#8220;cp -f #{shared_dir}/environment.rb #{current_path}/config/environment.rb&#8221;
+run &#8220;cp -f #{shared_dir}/database.yml #{current_path}/config/database.yml&#8221;
+end
+<p>即可</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/06/22/rails_ruby_community_faster_and_faster/">Rails/Ruby社区越来越快了</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-06-22T00:00:00+08:00" pubdate data-updated="true">Jun 22<span>nd</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Rails在6.1号就已经发布2.1了，这个号称参与人数最多，代码更改行数最多的版本，就这么漫不经心地来了。最近gems也发布1.2了，而且中文版本的《what&#8217;s new in rails 2.1》也基本上在网络上翻译好了，rails的社区参与度与活跃度也最来最高了，这样的rails/ruby社区怎能不越来越快？</p>
+<p>最近依然在忙碌中度过，上来写写博文只能算是应个景儿，有点对不起自己了:(</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/06/05/running_on_rails/">Running on rails&#8212;&#8211;在铁轨上奔跑速度自然就会快:P</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-06-05T00:00:00+08:00" pubdate data-updated="true">Jun 5<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近一直忙于工作，居然有两周没有写blog了，不过也不是完全没有时间写，只是因为实在是没有什么时间来实践rails上的一些新东东，觉得言之无物:(</p>
+<p>不过ruby/rails社区最近却是如大事连连：先是rails 2.1的发布，还有就是ironruby在rubinius之后也宣布可以运行rails了，这个所有ruby实现都视之为重要目标的里程碑。</p>
+<p>一旦运行上了轨道，后面自然是一发而不可收拾噢，虽然我对ironruby的兴趣缺缺的说</p>
+<p>只是偶然发现ruby on rails的这个名字真的很有趣，以至于我自己能生造出Running On Rails这样古怪的半通不通的双关来，算是玩笑吧:P</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/19/rubinius_supports_rails/">Rubinius开始支持rails了</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-19T00:00:00+08:00" pubdate data-updated="true">May 19<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>不是我不明白，只是这个世界变得快!</p>
+<p>最近因为地震的原因，在网上看新闻的时侯比较多，对于ruby的新进展的了解要慢了几拍：</p>
+<p>昨天才知道dreamhost已经开始支持mod_rails了，还写下了一篇&quot;酸溜溜的blog&quot;:blog</p>
+<p>今天也是通过从InfoQ订阅的新闻中得知Rubinius开始支持rails了，好消息啊，这是续它支持gems与merb之后又一重大的里程碑啊，贺之！看来以后新的rails的基于rubinius的host主机很可能会出现了，最有可能的自然是&quot;engineyard&quot;:http://engineyard.com/ 了，只是不希望太贵噢，这样我还能试试，不过想来可能性不大:(</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/19/capistrino-on-dreamhost-with-mod_rails/">使用Capistrano在Dreamhost上部署mod_rails</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-19T00:00:00+08:00" pubdate data-updated="true">May 19<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>虽然以前<a href="http://capify.org/">Capistrno</a> 在windows下不能使用，但是自从2.0以后，其实就是可以使用的了。而且现在的2.3还加入了对git的支持。</p>
+
+
+	<p>而且从<a href="http://www.infoq.com/cn/news/2008/05/rails-deployment-roundup">InfoQ</a> 上得知<a href="http://tomcopeland.blogs.com/juniordeveloper/2008/05/mod_rails-and-c.html">Tom Copeland</a> 已经使用Capistrano来更新mod_rails了,的确如它所说，只是给这个应用程序建立了一个“restart.txt”文件，就会导致Passenger Phusion/mod_rails重启这个应用程序。的确很简单明了不是吗？</p>
+
+
+	<p>最终的deploy.rb文件看起来会象下面这样</p>
+
+<div class="jssc">
+  <ul style="margin-left: 39px;">
+    <li class="alt">
+      <div>
+        
+set&nbsp;:scm,&nbsp;:subversion      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:repository,&nbsp;        <span class="cstring">
+&quot;http://yoursvn/trunk&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+set&nbsp;:svn_username,&nbsp;        <span class="cstring">
+&quot;svnuser&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:svn_password,&nbsp;        <span class="cstring">
+&quot;svnpassword&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div style="background-color: rgb(255, 255, 153);">
+        
+role&nbsp;:app,&nbsp;        <span class="cstring">
+&quot;www.yourdomain.com&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+role&nbsp;:web,&nbsp;        <span class="cstring">
+&quot;www.yourdomain.com&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+role&nbsp;:db,&nbsp;&nbsp;        <span class="cstring">
+&quot;www.yourdomain.com&quot;        </span>
+,&nbsp;:primary&nbsp;=&gt;&nbsp;        <span class="ckeywords">
+true        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:deploy_to,&nbsp;        <span class="cstring">
+&quot;/home/yourusername/&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+set&nbsp;:user,&nbsp;        <span class="cstring">
+&quot;yourusername&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:password,&nbsp;        <span class="cstring">
+&quot;yourpassword&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:use_sudo,&nbsp;        <span class="ckeywords">
+false        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+namespace&nbsp;:deploy&nbsp;        <span class="ckeywords">
+do        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;desc&nbsp;        <span class="cstring">
+&quot;restarting&nbsp;mod_rails&nbsp;with&nbsp;restart.txt&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;task&nbsp;:restart,&nbsp;:roles&nbsp;=&gt;&nbsp;:app,&nbsp;:except&nbsp;=&gt;&nbsp;{&nbsp;:no_release&nbsp;=&gt;&nbsp;        <span class="ckeywords">
+true        </span>
+&nbsp;}&nbsp;        <span class="ckeywords">
+do        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;&nbsp;&nbsp;run&nbsp;        <span class="cstring">
+&quot;touch&nbsp;#{current_path}/tmp/restart.txt&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;end      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;[:start,&nbsp;:stop].each&nbsp;        <span class="ckeywords">
+do        </span>
+&nbsp;|t|      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;&nbsp;&nbsp;desc&nbsp;        <span class="cstring">
+&quot;#{t}&nbsp;task&nbsp;is&nbsp;a&nbsp;no-op&nbsp;with&nbsp;mod_rails&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;&nbsp;&nbsp;task&nbsp;t,&nbsp;:roles&nbsp;=&gt;&nbsp;:app&nbsp;        <span class="ckeywords">
+do        </span>
+&nbsp;;&nbsp;end      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;end      </div>
+    </li>
+    <li>
+      <div>
+        
+end      </div>
+    </li>
+  </ul>
+</div>
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/18/mod_rails-on-dreamhost/">Dreamhost真的开始支持mod_rails了</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-18T00:00:00+08:00" pubdate data-updated="true">May 18<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>呵呵，这个当然是好事，只可惜我&quot;一语成谶&quot;:chen ， 正好在&quot;DreamHost&quot;:http://www.dreamhost.com 支持mod_rails的两天之前写了两篇关于怎样在dreamhost上安装ruby、rails与gems的&quot;blog&quot;:blog,  当然现在这些东东已经过期了，不再有用了，看来以后有什么心得就需要立刻记下来，第一为了免得稍纵即逝错过了最想记录下来的冲动时刻，第二也许我早点写出来，可能会对大家更有用，起码能让后来者少起点弯路（有点自以为的是地想）。当然做我们这么行，知识的过期是再正常不过的了，不过当年在那儿探索的苦恼与成功之后的喜悦是不可能忘却的，而且从中学到的一些东西也并不是全无用处，比如虽然有了mod_rails但是当你需要自己的gems时，还是可以自己装一份来用的嘛，只是不会再遇到我所遇到的那些莫名的<br />
+<strong><br />
+FastCGI: comm with (dynamic) server &#8220;/home/u/domain/public/dispatch.fcgi&#8221; aborted: (first read) idle timeout (60 sec)<br />
+</strong><br />
+的挫折了，这自然是好事噢，有点不甘心地说:P</p>
+<p>嗯，如dreamhost所说一般以domain的控制面板上多了一个Ruby on Rails Passenger的选项，勾上就好了，简单得不行了吧，不过有一点要注意，dispatch.fcgi中的代码将会永远用不到了，所以如果如我一般自己安装了gems的并有dispatch.fcgi中配置了gems的路径的话，就需要将</p>
+<pre>
+<code>
+ENV["GEM_HOME"]="/home/yourusername/.gems"
+ENV["GEM_PATH"]="/home/yourusername/.gems:/usr/lib/ruby/gems/1.8"
+</code>
+</pre>
+<p>移到config/enviroment.rb中的ENV[&#8216;RAILS_ENV&#8217;] ||= &#8217;production&#8217;之后就好了，否则可能会看到一个mod_rails提示的出错页面，无它，很简单的，不错</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/4/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/2/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

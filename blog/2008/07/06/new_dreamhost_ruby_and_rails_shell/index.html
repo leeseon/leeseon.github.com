@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>更新了一下脚本 - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="自从&quot;上回&quot;:post 之后，ruby、rails与gems也都开始更新了，于是也更新了一下安装脚本，如下：
+mkdir ~/.gems
+echo &#8216;export GEM_HOME=&#8220;$HOME/.gems&#8221;&#8217; &gt;&gt &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/2008/07/06/new_dreamhost_ruby_and_rails_shell">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">更新了一下脚本</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-07-06T00:00:00+08:00" pubdate data-updated="true">Jul 6<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>自从&quot;上回&quot;:post 之后，ruby、rails与gems也都开始更新了，于是也更新了一下安装脚本，如下：</p>
+<div class="jssc"><ul style="margin-left: 39px;"><li class="alt"><div>mkdir ~/.gems</div><p></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><div>echo <span class="cchar">&#8216;export GEM_HOME=&#8220;$<span class="caps">HOME</span>/.gems&#8221;&#8217;</span> &gt;&gt; .bash_profile</p>
+<p></div></li><li class="alt"><div>echo <span class="cchar">&#8216;export GEM_PATH=&#8220;$GEM_HOME:/usr/lib/ruby/gems/1.8&#8221;&#8217;</span> &gt;&gt; .bash_profile</p>
+<p></div></li><li class="alt"><div>echo <span class="cchar">&#8216;export <span class="caps">PATH</span>=&#8220;$<span class="caps">HOME</span>/.gems/bin:$<span class="caps">PATH</span>&#8221;&#8217;</span> &gt;&gt; .bash_profile</p>
+<p></div></li><li class="alt"><div>echo <span class="cchar">&#8216;export <span class="caps">PATH</span>=&#8220;$<span class="caps">HOME</span>/local/bin:$<span class="caps">PATH</span>&#8221;&#8217;</span> &gt;&gt; .bash_profile</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><div>. ~/.bash_profile</p>
+<p></div></li><li class="alt"><div>echo $<span class="caps">PATH</span></p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><div>touch ~/.gemrc</p>
+<p></div></li><li class="alt"><div>echo gemhome:/home/$(whoami)/.gems &gt;&gt; ~/.gemrc</p>
+<p></div></li><li class="alt"><div>echo gempath: &gt;&gt; ~/.gemrc</p>
+<p></div></li><li class="alt"><div>echo -/home/$(whoami)/.gems &gt;&gt; ~/.gemrc</p>
+<p></div></li><li class="alt"><div>echo -/usr/lib/ruby/gems/1.8 &gt;&gt; ~/.gemrc</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># setup directories<br />
+</span></li><li class="alt"><div>mkdir -p ~/local/usr/src/ruby</p>
+<p></div></li><li class="alt"><div>cd ~/local/usr/src/ruby</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># Install readline<br />
+</span></li><li class="alt">wget <span class="htmlstring">ftp://ftp.cwru.edu/pub/bash/readline-5.2.tar.gz</span></p>
+<p></li><li class="alt"><div>tar zxvf readline-5.2.tar.gz</p>
+<p></div></li><li class="alt"><div>cd readline-5.2</p>
+<p></div></li><li class="alt"><div>./configure &#8212;prefix=$<span class="caps">HOME</span>/local</p>
+<p></div></li><li class="alt"><div>make</p>
+<p></div></li><li class="alt"><div>make install</p>
+<p></div></li><li class="alt"><div>cd ..</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># install ruby<br />
+</span></li><li class="alt">wget <span class="htmlstring">ftp://ftp.ruby-lang.org/pub/ruby/1.8/ruby-1.8.7-p22.tar.bz2</span></p>
+<p></li><li class="alt"><div>tar jxvf ruby-1.8.7-p22.tar.bz2</p>
+<p></div></li><li class="alt"><div>cd ruby-1.8.7-p22</p>
+<p></div></li><li class="alt"><div>./configure &#8212;prefix=$<span class="caps">HOME</span>/local &#8212;with-readline-dir=$<span class="caps">HOME</span>/local/</p>
+<p></div></li><li class="alt"><div>make</p>
+<p></div></li><li class="alt"><div>make install</p>
+<p></div></li><li class="alt"><div>cd ..</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># fix path<br />
+</span></li><li class="alt"><div>export <span class="caps">PATH</span>=$<span class="caps">HOME</span>/local/bin:$<span class="caps">PATH</span></p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># get rubygems<br />
+</span></li><li class="alt">wget <span class="htmlstring">http://rubyforge.org/frs/download.php/38646/rubygems-1.2.0.tgz</span></p>
+<p></li><li class="alt"><div>tar zxvf rubygems-1.2.0.tgz</p>
+<p></div></li><li class="alt"><div>cd rubygems-1.2.0</p>
+<p></div></li><li class="alt"><div>$<span class="caps">HOME</span>/local/bin/ruby setup.rb config &#8212;prefix=$<span class="caps">HOME</span>/local</p>
+<p></div></li><li class="alt"><div>$<span class="caps">HOME</span>/local/bin/ruby setup.rb setup</p>
+<p></div></li><li class="alt"><div>$<span class="caps">HOME</span>/local/bin/ruby setup.rb install</p>
+<p></div></li><li class="alt"><div>cd ..</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># Install <span class="caps">RAILS</span><br />
+</span></li><li class="alt"><div>gem install rails</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># Install FastCGI<br />
+</span></li><li class="alt">curl -O <span class="htmlstring">http://www.fastcgi.com/dist/fcgi-2.4.0.tar.gz</span></p>
+<p></li><li class="alt"><div>tar xzvf fcgi-2.4.0.tar.gz</p>
+<p></div></li><li class="alt"><div>cd fcgi-2.4.0</p>
+<p></div></li><li class="alt"><div>./configure &#8212;prefix=$<span class="caps">HOME</span>/local</p>
+<p></div></li><li class="alt"><div>make</p>
+<p></div></li><li class="alt"><div>make install</p>
+<p></div></li><li class="alt"><div>cd ..</p>
+<p></div></li><li class="alt"><div></p>
+<p></div></li><li class="alt"><span class="ccomment"># Install FastCGI &amp; MySQL gem packages<br />
+</span></li><li class="alt"><div>gem install fcgi &#8212; &#8212;with-fcgi-dir=$<span class="caps">HOME</span>/local</p>
+<p></div></li><li class="alt"><div>gem install mysql &#8212; &#8212;with-mysql-config</p>
+<p></div></li><li class="alt"><span class="ccomment"># gem  update</span></li></ul></div></p>
+<p>关于脚本的解释可以看&quot;以前&quot;:post2 的说明，这次仅仅只是版本上的更新而已，不再多做说明</p>
+<p>文件依然放在&quot;http://leeseon.com/private/allinstall.sh&quot;:shell 处</p>
+<p>也同样可以使用</p>
+<pre>
+<code>
+curl http://leeseon.com/private/allinstall.sh | sh
+</code>
+</pre>
+<p>来执行，无它、、、</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-07-06T00:00:00+08:00" pubdate data-updated="true">Jul 6<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://leeseon.github.com/blog/2008/07/06/new_dreamhost_ruby_and_rails_shell/" data-via="" data-counturl="http://leeseon.github.com/blog/2008/07/06/new_dreamhost_ruby_and_rails_shell/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/07/06/capistrano_deploy_and_source_control_practice/" title="Previous Post: Capistrano配置及版本控制实践">&laquo; Capistrano配置及版本控制实践</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/09/06/dreamhost_promo_code_leeseon/" title="next Post: 做下广告吧Promo Code LEESEON">做下广告吧Promo Code LEESEON &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

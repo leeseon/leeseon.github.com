@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mephisto0.8出错了:( - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="好久没有写blog了，最近才发现游戏公司忙起来还真的不是一般的忙，现在对那著名的“对EA的血泪控诉”也开始是感同身受了啊，唉! 好在最近闲下来了一点，而且发现自己的gmail里面堆满了从dreamhost发过来的Cron Daemon的错误提示，提示我mephisto的/admin出错了。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/2008/09/06/mephisto0-8_error_maybe_from_edge_rails">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">mephisto0.8出错了:(</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-09-06T00:00:00+08:00" pubdate data-updated="true">Sep 6<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>好久没有写blog了，最近才发现游戏公司忙起来还真的不是一般的忙，现在对那著名的“对EA的血泪控诉”也开始是感同身受了啊，唉!</p>
+
+
+<p>好在最近闲下来了一点，而且发现自己的gmail里面堆满了从dreamhost发过来的Cron Daemon的错误提示，提示我mephisto的/admin出错了。</p>
+
+
+<p>本来没有当回事，估计是因为dreamhost的rails升级到2.1.0引起的，当时我使用mephisto0.8，因为正好系统中有rails 2.0.2一时偷懒没有将rails freeze起来，心想应该freeze一下就没有问题了。二话不说，开工，运行</p>
+<pre>
+<code>
+rake rails:freeze:gems VERSION=2.0.2
+</code>
+</pre>
+<p>本以为重启一下服务就能好了，谁知出了一堆错，提示我 &#8220;undefined method &#8216;install_gem_spec_stubs&#8217;&#8221;</p>
+
+<p>查了一下文档，不对啊，install_gem_spec_stubs可是rails2.1.0中的函数啊，怎么会出现在mephisto 0.8之中，怪啊，不过即然如此，拿2.0.2试试便知，运行</p>
+<pre>
+<code>
+rails _2.0.2_ testrails
+</code>
+</pre>
+<p>打开config/boot.rb看了看，根本不用比较工具就能发现mephisto0.8的文件中的确是多出一行，注掉即可</p>
+
+<pre class="blackboard">  <span class="Keyword">class</span> <span class="Entity">VendorBoot<span class="Superclass"> <span class="Superclass">&lt;</span> Boot</span></span>
+    <span class="Keyword">def</span> <span class="Entity">load_initializer</span>
+      <span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span><span class="String"><span class="String">#{</span><span class="Variable">RAILS_ROOT</span><span class="String">}</span></span>/vendor/rails/railties/lib/initializer<span class="String">&quot;</span></span>
+<span class="Comment">      <span class="Comment">#</span>Rails::Initializer.run(:install_gem_spec_stubs)</span>
+    <span class="Keyword">end</span>
+  <span class="Keyword">end</span>
+</pre>
+
+<p>想想，可能是因为使用edge rails来生成的mephisto 0.8的原始文件的吧</p>
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-09-06T00:00:00+08:00" pubdate data-updated="true">Sep 6<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://leeseon.github.com/blog/2008/09/06/mephisto0-8_error_maybe_from_edge_rails/" data-via="" data-counturl="http://leeseon.github.com/blog/2008/09/06/mephisto0-8_error_maybe_from_edge_rails/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/09/06/dreamhost_promo_code_leeseon/" title="Previous Post: 做下广告吧Promo Code LEESEON">&laquo; 做下广告吧Promo Code LEESEON</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/10/05/rubinius-and-llvm-jit/" title="next Post: Rubinius与LLVM">Rubinius与LLVM &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

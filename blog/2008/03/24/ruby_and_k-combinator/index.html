@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Ruby 及 K-combinator - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="闲读mephisto的代码，发现其中N多地方用到returning，看着很怪，难道又多出了一个关键字？
+grep一下，自然不是，这个是源自active_support\core_ext\object\misc.rb: Class Object def returning(value) yield( &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/2008/03/24/ruby_and_k-combinator">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Ruby 及 K-combinator</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-03-24T00:00:00+08:00" pubdate data-updated="true">Mar 24<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>闲读mephisto的代码，发现其中N多地方用到returning，看着很怪，难道又多出了一个关键字？</p>
+<p>grep一下，自然不是，这个是源自active_support\core_ext\object\misc.rb:<br />
+<pre><br />
+<code>
+Class Object
+  def returning(value)
+    yield(value)
+    value
+  end
+end
+</code><br />
+</pre></p>
+<p>粗看之下，极其简单无甚好说，但是为什么会这样用？又是一个idiom？</p>
+<p>google之，却发现绝不简单，正如它的注释所说这是一个“ A Ruby-ized realization of the K combinator, courtesy of Mikael Brockman.”</p>
+<p>在&quot;这里&quot;:http://weblog.jamisbuck.org/2006/10/27/mining-activesupport-object-returning  发现了我心不孤，也有人大大感吧了一番了Brockman的天才想法。</p>
+<p>本人词拙，还是半译半抄Jamis的解释吧：</p>
+<p>Basically, the K combinator is a function of two arguments, that merely returns the first argument. The second argument is useful only for the side-effects it has on the first argument. The implementation of this in Ruby is beautifully succinct:</p>
+<p>简单的说， K组合子是一个有两个参数的函数，它仅仅是直接返回第一个参数。而第二个参数唯一个作用就是对第一个参数增加点付作用(修改)。由此可见，它的Ruby实现是如何的简洁了。(几乎无一字可减，很强很简洁)</p>
+<p>当然如果你对ruby的语法不是太熟，可能还是不能体会出其中的真意，所以Jamis又解释道：</p>
+<p>It takes a value (the first argument), yields it to the associated block (the implicit second argument), and then returns the value. The block is used to operate on the first argument, and thus (by its side-effects) provides the actual work of this method.</p>
+<p>returning函数，将value(第一个参数)应用(yield)到与之关联的block上(block其实就是隐含的第二个参数)，然后返回value. 其中block只是用来对第一个参数进行操作，通过这种(付作用/修改)也就完成了方法真正的工作。</p>
+<p>噢，如果你还与我一样依然对这个K combinator怀有好奇心的话，可以继续google之，才发现这个K也是很不简单的滴，它来源于那让人费解的SKI combinator中的第二个。</p>
+<p>SKI的伟大之处，在于证明了所有的函数都是可以被分解为S与K的。读到这里你否有一点灵光一闪？我靠，这不是与所有的计算都能还原这一个加法器这一原理般似曾相识？还有那让人头痛了很久了ackman函数、、、</p>
+<p>唉，伟大的数学家啊，唉，牛B的ruby与Brockman</p></div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-03-24T00:00:00+08:00" pubdate data-updated="true">Mar 24<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://leeseon.github.com/blog/2008/03/24/ruby_and_k-combinator/" data-via="" data-counturl="http://leeseon.github.com/blog/2008/03/24/ruby_and_k-combinator/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/03/24/pirated_microsoft_and_WEB/" title="Previous Post: 盗版、微软=>WEB">&laquo; 盗版、微软=>WEB</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/03/27/being_interesting/" title="next Post: 事情开始变得有趣">事情开始变得有趣 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

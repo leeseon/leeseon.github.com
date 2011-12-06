@@ -1,0 +1,495 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Rubinius与LLVM - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="一直对Rubinius所宣称的“Ruby In Ruby”很以为然，而且龙书中之也提到一个语言成熟的标志之一就是能“自举”&#8211;即使用自已来实现自己。以此为标准，Fortran、Basic、Javascript、Perl、PHP之类应该都算是不举，而LISP、C/C++、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/2008/10/05/rubinius-and-llvm-jit">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Rubinius与LLVM</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-10-05T00:00:00+08:00" pubdate data-updated="true">Oct 5<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>一直对<a href="http://rubini.us/">Rubinius</a>所宣称的“Ruby In Ruby”很以为然，而且龙书中之也提到一个语言成熟的标志之一就是能“自举”&#8211;即使用自已来实现自己。以此为标准，Fortran、Basic、Javascript、Perl、PHP之类应该都算是不举，而LISP、C/C++、Smalltalk早就是很举的，Python、Java与Ruby现在是半举，并在让自己摆脱ED的印象之中，而<a href="http://rubini.us/">Rubinius</a>自然是Rubyist的春药罗</p>
+<p>这两天读到<a href="http://blog.fallingsnow.net/2008/05/23/simple-vm-jit-with-llvm/">Simple VM JIT with LLVM</a> 觉得很是有趣，不过奇怪的是居然这个网站也被盾了，如果你从来没有tor过，或者gladder过，建议你赶紧找一个翻过墙去看看。不过顺便也谈谈我的读后感吧，算是学习笔记了。</p>
+<p>Rubinius与YARV一样是一个虚拟机(VM)，它如同Python一样，先将源代码编译成Bytecode文件，在执行时优先执行Bytecode。这样能提高ruby的执行效率。说到VM自然不能不说它的bc了，一个VM无非就是拿一些bc来执行了事而已，其实PC也是这样的，只是一个实一个虚而已。</p>
+<p>Evan为了举例说明，首先杜撰了一个足够tiny的VM：</p>
+<ul>
+<li>只操作整数</li> 
+<li>被编号的寄存器</li>  
+<li>只有三条指令</li>  
+<li>
+<ol>
+<li><b>0 - set(reg, val)</b>　将第reg号寄存器设为整数值val </li> 
+<li><strong>1 - add(result, reg, val)</strong>&nbsp; 将第reg寄存器与val相加，并将结果放入result寄存器 </li> 
+<li><b>2 - show(reg)</b> 将寄存器reg中的内容打印出来</li>
+</ol>
+</li>
+</ul>
+<p>因此下面这字节</p><pre>  [ 0, 0, 3,
+    1, 0, 0, 4,
+    2, 0 ]</pre>
+<p>就表明将3与4相加并打印出来这样一个简单的功能，结果嘛如果不出意思自然是7</p>
+<p>用C实现这个VM最平铺直叙的方法就是直接写就好了，如下</p><pre class="blackboard"><span class="Storage">void</span> add(<span class="Storage">int</span>* ops, <span class="Storage">int</span>* registers) {
+  registers[ops[<span class="Constant">1</span>]] = registers[ops[<span class="Constant">2</span>]] + ops[<span class="Constant">3</span>];
+}
+
+<span class="Storage">void</span> set(<span class="Storage">int</span>* ops, <span class="Storage">int</span>* registers) {
+  registers[ops[<span class="Constant">1</span>]] = ops[<span class="Constant">2</span>];
+}
+
+<span class="Storage">void</span> <span class="Entity">sh<span class="Entity">ow</span></span>(<span class="Storage">int</span>* ops, <span class="Storage">int</span>* registers) {
+  <span class="Support">printf</span>(<span class="String"><span class="String">"</span>=&gt; <span class="StringInterpolation">%d</span><span class="Constant">\n</span><span class="String">"</span></span>, registers[ops[<span class="Constant">1</span>]]);
+}
+
+<span class="Storage">void</span> run(<span class="Storage">int</span>* ops, <span class="Storage">int</span>* registers) {
+  <span class="Keyword">switch</span>(*ops) {
+  <span class="Keyword">case</span> <span class="Constant">0</span>:
+	set(ops, registers);
+	ops += <span class="Constant">3</span>;
+    <span class="Keyword">break</span>;
+  <span class="Keyword">case</span> <span class="Constant">1</span>:
+	add(ops, registers);
+	ops += <span class="Constant">4</span>;
+    <span class="Keyword">break</span>;
+  <span class="Keyword">case</span> <span class="Constant">2</span>:
+	show(ops, registers);
+    <span class="Keyword">return</span>;
+  }
+}
+</pre>
+<p>随后Evan还另给出一个去除switch的直接的不能再直接的版本：</p>
+<pre class="blackboard"><span class="Storage">void</span> <span class="Entity">my_progr<span class="Entity">am</span></span>() {
+  <span class="Storage">int</span> registers[<span class="Constant">2</span>] = {<span class="Constant">0</span>, <span class="Constant">0</span>};
+  <span class="Storage">int</span> program[<span class="Constant">10</span>] = [ <span class="Constant">0</span>, <span class="Constant">0</span>, <span class="Constant">3</span>,
+                      <span class="Constant">1</span>, <span class="Constant">0</span>, <span class="Constant">0</span>, <span class="Constant">4</span>,
+                      <span class="Constant">2</span>, <span class="Constant">0</span> ]
+
+  <span class="Storage">int</span>* ops = (<span class="Storage">int</span>*)program;
+
+  set(ops, registers);
+  ops += <span class="Constant">3</span>;
+  add(ops, registers);
+  ops += <span class="Constant">4</span>;
+  show(ops, registers);
+  ops += <span class="Constant">2</span>;
+}
+</pre>
+<p>其实两者的功能是一样的，唯一的区别是前者更通用一点，可以在运行时执行，而后者比较象使用Bytecode直接翻译过来的样子。</p>
+<p>而且的确是这样，处理这样将Bytecode执行的一种最最静态的方法，就是写一个bc的C代码生成器(C code emitter)，将bc一次解析并产生一个类似第二段代码后几句的c代码文件，然后编译执行即可。</p>
+<p>不过这种方法最大的缺点就是太静态了，所以的东西已经在编译时就定了，这当然不是Rubinius可以使用的方式，至于如第一段代码那样，一个更动态一点的方法，就是写一个解释器，在运行时解析代码并动态执行。其实这就有点类似YARV的方式。<br/>除此之外有没有别的什么方法还执行bc呢？自然是有的，而且早就有很多人使用过了，那就是JIT(Just-in-time compilation)嘛:　JIT是一个不那么纯编译也不那么纯解释的方法，bc在被执行前，先被转成目标机器上的原生指令，然后再执行，因为这一过程是即时的生成的，因此可以在其中增加一个优化的环节。而且因为代码是即时生成的，因此它可以对生成的代码做一些caching，所以它要比一句一句“忠实”执行的解释器快，而且因为JIT能获得更多的运行时信息，如CPU的架构及代码执行统计信息，因此能够生成一些CPU“特化”的代码及运行时的优化工作，所以JIT也是很有可能比静态编译要快的。</p>
+<p>其实说了这么多也不过是为了引入今天所要谈的主角&#8212;&#8211;<a href="http://llvm.org/">LLVM</a>: LLVM并不是一个编译器，而仅仅只是一个编译器的基础设施(infrastructure)，这个比较绕，其实它最有趣是提供了一套语言无关的中间层的优化与分析工具集。晕，其实这样说依然很绕:( 不过如果看一看Evan的例子之后可能会明白一些</p>
+<p>首先就算是JIT也是需要将Bytecode的语义，即set/add/show指令提供给LLVM滴，先将这三个函数放入一个ops.c文件中，再用到llvm-gcc工具了，它利用gcc的前端，将C代码转换成LLVM的bc文件</p>
+<p>命令如下</p>
+<p><code>llvm-gcc -emit-llvm -O3 -c ops.c</code></p>
+<p>这会生成一个ops.o的bc文件</p>
+<p>使用<code>llvm-dis &lt; ops.o</code>　命令查看，会看到与bc文件相对应的LLVM汇编指令</p>
+<p>&nbsp;</p><pre class="blackboard">@.<span class="Entity">str</span> <span class="Keyword">=</span> internal constant [<span class="Constant">7</span> x i8] c<span class="String"><span class="String">"</span>=&gt; %dA0<span class="String">"</span></span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+
+define void <span class="Variable"><span class="Variable">@</span>add</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) nounwind  {
+entry:
+	<span class="Keyword">%</span>tmp1 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">2</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp5		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp8 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp7, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp10 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">3</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp11 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp10, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp12 <span class="Keyword">=</span> add i32 <span class="Keyword">%</span>tmp11, <span class="Keyword">%</span>tmp8		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp14 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	store i32 <span class="Keyword">%</span>tmp12, i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp14, align <span class="Constant">4</span>
+	ret void
+}
+
+define void <span class="Variable"><span class="Variable">@</span>set</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) nounwind  {
+entry:
+	<span class="Keyword">%</span>tmp1 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">2</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	store i32 <span class="Keyword">%</span>tmp5, i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp7, align <span class="Constant">4</span>
+	ret void
+}
+
+declare i32 <span class="Variable"><span class="Variable">@</span>printf</span>(i8<span class="Keyword">*</span>, ...) nounwind 
+
+define void <span class="Variable"><span class="Variable">@</span>show</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) nounwind  {
+entry:
+	<span class="Keyword">%</span>tmp1 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5 <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7 <span class="Keyword">=</span> tail call i32 (i8<span class="Keyword">*</span>, ...)<span class="Keyword">*</span> <span class="Variable"><span class="Variable">@</span>printf</span>( i8<span class="Keyword">*</span> getelementptr ([<span class="Constant">7</span> x i8]<span class="Keyword">*</span> @.<span class="Entity">str</span>, i32 <span class="Constant">0</span>, i32 <span class="Constant">0</span>), i32 <span class="Keyword">%</span>tmp5 ) nounwind 		;  [<span class="Comment"><span class="Comment">#</span>uses=0]</span>
+	ret void
+}
+</pre>
+<p>无它，这个ops.o主要是拿来给LLVM使用的，在运行时生成相应的语义调用</p>
+<p>然后使用LLVM的C++ API来生成一段与第二段代码相应的LLVM代码</p>
+<p>&nbsp;</p><pre class="blackboard">Function* <span class="Entity">crea<span class="Entity">te</span></span>(Module** out) {
+  std::string error;
+  Module* jit;
+
+  <span class="Comment"><span class="Comment">//</span> Load in the bitcode file containing the functions for each</span>
+  <span class="Comment"><span class="Comment">//</span> bytecode operation.</span>
+  <span class="Keyword">if</span>(MemoryBuffer* buffer = MemoryBuffer::getFile(<span class="String"><span class="String">"</span>ops.o<span class="String">"</span></span>, &amp;error)) {
+    jit = ParseBitcodeFile(buffer, &amp;error);
+    <span class="Keyword">delete</span> buffer;
+  }
+
+  <span class="Comment"><span class="Comment">//</span> Pull out references to them.</span>
+  Function* set =  jit-&gt;getFunction(std::string(<span class="String"><span class="String">"</span>set<span class="String">"</span></span>));
+  Function* add =  jit-&gt;getFunction(std::string(<span class="String"><span class="String">"</span>add<span class="String">"</span></span>));
+  Function* show = jit-&gt;getFunction(std::string(<span class="String"><span class="String">"</span>show<span class="String">"</span></span>));
+
+  <span class="Comment"><span class="Comment">//</span> Now, begin building our new function, which calls the</span>
+  <span class="Comment"><span class="Comment">//</span> above functions.</span>
+  Function* body = cast&lt;Function&gt;(jit-&gt;getOrInsertFunction(<span class="String"><span class="String">"</span>body<span class="String">"</span></span>,
+        Type::VoidTy,
+        PointerType::getUnqual(Type::Int32Ty),
+        PointerType::getUnqual(Type::Int32Ty), (Type*)<span class="Constant">0</span>));
+
+  <span class="Comment"><span class="Comment">//</span> Our function will be passed the ops pointer and the</span>
+  <span class="Comment"><span class="Comment">//</span> registers pointer, just like before.</span>
+  Function::arg_iterator args = body-&gt;arg_begin();
+  Value* ops = args++;
+  ops-&gt;setName(<span class="String"><span class="String">"</span>ops<span class="String">"</span></span>);
+  Value* registers = args++;
+  registers-&gt;setName(<span class="String"><span class="String">"</span>registers<span class="String">"</span></span>);
+
+  BasicBlock *bb = BasicBlock::Create(<span class="String"><span class="String">"</span>entry<span class="String">"</span></span>, body);
+
+  <span class="Comment"><span class="Comment">//</span> Set up our arguments to be passed to set.</span>
+  std::vector&lt;Value*&gt; params;
+  params.push_back(ops);
+  params.push_back(registers);
+
+  <span class="Comment"><span class="Comment">//</span> Call out to set, passing ops and registers down</span>
+  CallInst* call = CallInst::Create(set, params.begin(), params.end(), <span class="String"><span class="String">"</span><span class="String">"</span></span>, bb);
+  ConstantInt* const_3 = ConstantInt::get(APInt(<span class="Constant">32</span>,  <span class="String"><span class="String">"</span>3<span class="String">"</span></span>, <span class="Constant">10</span>));
+  ConstantInt* const_4 = ConstantInt::get(APInt(<span class="Constant">32</span>,  <span class="String"><span class="String">"</span>4<span class="String">"</span></span>, <span class="Constant">10</span>));
+
+  <span class="Comment"><span class="Comment">//</span> add 3 to the ops pointer.</span>
+  GetElementPtrInst* ptr1 = GetElementPtrInst::Create(ops, const_3, <span class="String"><span class="String">"</span>tmp3<span class="String">"</span></span>, bb);
+
+  <span class="Comment"><span class="Comment">//</span> Setup and call add, notice we pass down the updated ops pointer</span>
+  <span class="Comment"><span class="Comment">//</span> rather than the original, so that we've moved down.</span>
+  std::vector&lt;Value*&gt; params2;
+  params2.push_back(ptr1);
+  params2.push_back(registers);
+  CallInst* call2 = CallInst::Create(add, params2.begin(), params2.end(), <span class="String"><span class="String">"</span><span class="String">"</span></span>, bb);
+
+  <span class="Comment"><span class="Comment">//</span> Push the ops pointer down another 4.</span>
+  GetElementPtrInst* ptr2 = GetElementPtrInst::Create(ops, const_4, <span class="String"><span class="String">"</span>tmp3<span class="String">"</span></span>, bb);
+
+  <span class="Comment"><span class="Comment">//</span> Setup and call show.</span>
+  std::vector&lt;Value*&gt; params3;
+  params3.push_back(ptr2);
+  params3.push_back(registers);
+  CallInst* call3 = CallInst::Create(show, params3.begin(), params3.end(), <span class="String"><span class="String">"</span><span class="String">"</span></span>, bb);
+
+  <span class="Comment"><span class="Comment">//</span> And we're done!</span>
+  ReturnInst::Create(bb);
+
+  *out = jit;
+  <span class="Keyword">return</span> body;
+}
+
+</pre>
+<p>然后调用之</p><pre class="blackboard"><span class="Storage">int</span> <span class="Entity">ma<span class="Entity">in</span></span>() {
+  <span class="Comment"><span class="Comment">//</span> The registers.</span>
+  <span class="Storage">int</span> registers[<span class="Constant">2</span>] = {<span class="Constant">0</span>, <span class="Constant">0</span>};
+
+  <span class="Comment"><span class="Comment">//</span> Our program.</span>
+  <span class="Storage">int</span> program[<span class="Constant">20</span>] = {<span class="Constant">0</span>, <span class="Constant">0</span>, <span class="Constant">3</span>,
+                     <span class="Constant">1</span>, <span class="Constant">0</span>, <span class="Constant">0</span>, <span class="Constant">4</span>,
+                     <span class="Constant">2</span>, <span class="Constant">0</span>};
+
+  <span class="Storage">int</span>* ops = (<span class="Storage">int</span>*)program;
+
+  <span class="Comment"><span class="Comment">//</span> Create our function and give us the Module and Function back.</span>
+  Module* jit;
+  Function* func = create(&amp;jit);
+
+  <span class="Comment"><span class="Comment">//</span> Add in optimizations. These were taken from a list that 'opt', LLVMs optimization tool, uses.</span>
+  PassManager p;
+
+  <span class="Comment"><span class="Comment">/*</span> Comment out optimize</span>
+<span class="Comment">  p.add(new TargetData(jit));</span>
+<span class="Comment">  p.add(createVerifierPass());</span>
+<span class="Comment">  p.add(createLowerSetJmpPass());</span>
+<span class="Comment">  p.add(createRaiseAllocationsPass());</span>
+<span class="Comment">  p.add(createCFGSimplificationPass());</span>
+<span class="Comment">  p.add(createPromoteMemoryToRegisterPass());</span>
+<span class="Comment">  p.add(createGlobalOptimizerPass());</span>
+<span class="Comment">  p.add(createGlobalDCEPass());</span>
+<span class="Comment">  p.add(createFunctionInliningPass());</span>
+<span class="Comment">  <span class="Comment">*/</span></span>
+
+  <span class="Comment"><span class="Comment">//</span> Run these optimizations on our Module</span>
+  p.run(*jit);
+
+  <span class="Comment"><span class="Comment">//</span> Setup for JIT</span>
+  ExistingModuleProvider* mp = <span class="Keyword">new</span> ExistingModuleProvider(jit);
+  ExecutionEngine* engine = ExecutionEngine::create(mp);
+
+  <span class="Comment"><span class="Comment">//</span> Show us what we've created!</span>
+  std::cout &lt;&lt; <span class="String"><span class="String">"</span>Created</span>
+<span class="String"><span class="String">"</span></span> &lt;&lt; *jit;
+
+  <span class="Comment"><span class="Comment">//</span> Have our function JIT'd into machine code and return. We cast it to a particular C function pointer signature so we can call in nicely.</span>
+  <span class="Storage">void</span> (*fp)(<span class="Storage">int</span>*, <span class="Storage">int</span>*) = (<span class="Storage">void</span> (*)(<span class="Storage">int</span>*, <span class="Storage">int</span>*))engine-&gt;getPointerToFunction(func);
+
+  <span class="Comment"><span class="Comment">//</span> Call what we've created!</span>
+  fp(ops, registers);
+}
+</pre>
+<p>最后的结果会是这样</p>
+<pre class="blackboard"><span class="Keyword">&lt;</span>snip same <span class="Variable">LLVM</span> as before<span class="Keyword">&gt;</span>
+
+define void <span class="Variable"><span class="Variable">@</span>body</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) {
+entry:
+call void <span class="Variable"><span class="Variable">@</span>set</span>( i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers )
+<span class="Keyword">%</span>tmp3 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">3</span> ;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+call void <span class="Variable"><span class="Variable">@</span>add</span>( i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp3, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers )
+<span class="Keyword">%</span>tmp31 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">4</span> ;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+call void <span class="Variable"><span class="Variable">@</span>show</span>( i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp31, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers )
+ret void
+}
+=&gt; <span class="Constant">7</span>
+</pre>
+<p>bc被执行了，不是吗？而且上面的那个boby就如同是<span class="Entity">my_progr<span class="Entity">am最后几行代码最直白的翻译，不同这处只是它是用API来产生的而已。</span></span></p>
+<p><span class="Entity"><span class="Entity">不过等等，最有趣的在后面，如果将LLVM的优化功能全部打开了之后，我们能得到什么？</span></span></p>
+<p><span class="Entity"><span class="Entity"></span></span>&nbsp;</p><pre class="blackboard">define void <span class="Variable"><span class="Variable">@</span>body</span>(i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers) {
+entry:
+	<span class="Keyword">%</span>tmp1.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2.<span class="Entity">i</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1.<span class="Entity">i</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">2</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5.<span class="Entity">i</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4.<span class="Entity">i</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2.<span class="Entity">i</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	store i32 <span class="Keyword">%</span>tmp5.<span class="Entity">i</span>, i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp7.<span class="Entity">i</span>, align <span class="Constant">4</span>
+	<span class="Keyword">%</span>tmp3 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">3</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=3]</span>
+	<span class="Keyword">%</span>tmp1.<span class="Entity">i7</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp3, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2.<span class="Entity">i8</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1.<span class="Entity">i7</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4.<span class="Entity">i9</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp3, i32 <span class="Constant">2</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5.<span class="Entity">i10</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4.<span class="Entity">i9</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7.<span class="Entity">i11</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp5.<span class="Entity">i10</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp8.<span class="Entity">i</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp7.<span class="Entity">i11</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp10.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp3, i32 <span class="Constant">3</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp11.<span class="Entity">i</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp10.<span class="Entity">i</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp12.<span class="Entity">i</span> <span class="Keyword">=</span> add i32 <span class="Keyword">%</span>tmp11.<span class="Entity">i</span>, <span class="Keyword">%</span>tmp8.<span class="Entity">i</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp14.<span class="Entity">i</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2.<span class="Entity">i8</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	store i32 <span class="Keyword">%</span>tmp12.<span class="Entity">i</span>, i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp14.<span class="Entity">i</span>, align <span class="Constant">4</span>
+	<span class="Keyword">%</span>tmp31 <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>ops, i32 <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp1.<span class="Entity">i2</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp31, i32 <span class="Constant">1</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp2.<span class="Entity">i3</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp1.<span class="Entity">i2</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp4.<span class="Entity">i4</span> <span class="Keyword">=</span> getelementptr i32<span class="Keyword">*</span> <span class="Keyword">%</span>registers, i32 <span class="Keyword">%</span>tmp2.<span class="Entity">i3</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp5.<span class="Entity">i5</span> <span class="Keyword">=</span> load i32<span class="Keyword">*</span> <span class="Keyword">%</span>tmp4.<span class="Entity">i4</span>, align <span class="Constant">4</span>		;  [<span class="Comment"><span class="Comment">#</span>uses=1]</span>
+	<span class="Keyword">%</span>tmp7.<span class="Entity">i6</span> <span class="Keyword">=</span> call i32 (i8<span class="Keyword">*</span>, ...)<span class="Keyword">*</span> <span class="Variable"><span class="Variable">@</span>printf</span>( i8<span class="Keyword">*</span> getelementptr ([<span class="Constant">7</span> x i8]<span class="Keyword">*</span> @.<span class="Entity">str</span>, i32 <span class="Constant">0</span>, i32 <span class="Constant">0</span>), i32 <span class="Keyword">%</span>tmp5.<span class="Entity">i5</span> ) nounwind 		;  [<span class="Comment"><span class="Comment">#</span>uses=0]</span>
+	ret void
+}
+=&gt; <span class="Constant">7</span>
+</pre>
+<p>&nbsp;</p>
+<p>对，函数被LLVM给Inline化了，强吧！Evan称之为使用核能做饭，呵呵。</p>
+<p>嗯，的确是很趣，那么我们从中又能学到什么呢？使用LLVM强大的中间层基础设施，可以为rubinius的bc执行带来强大的JIT功能。至于rubinius真的是怎样做到，让我读读rubinius的代码之后再接着谈吧:)</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-10-05T00:00:00+08:00" pubdate data-updated="true">Oct 5<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://leeseon.github.com/blog/2008/10/05/rubinius-and-llvm-jit/" data-via="" data-counturl="http://leeseon.github.com/blog/2008/10/05/rubinius-and-llvm-jit/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/09/06/mephisto0-8_error_maybe_from_edge_rails/" title="Previous Post: mephisto0.8出错了:(">&laquo; mephisto0.8出错了:(</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/11/10/from_textmate_to_emacs/" title="next Post: 从Textmate到Emacs">从Textmate到Emacs &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

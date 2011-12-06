@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>邮件发送提示成功，但是无法接收 - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="自己写了一段发送邮件的客户端程序，一直运行良好。可是某天开始，程序发送能提示成功，但是一直接收不到，深感诧异。将笔记本带回家中，程序又运行良好。第二天上班，发现问题依旧。
+随决定使用最原始的telnet命令查看问题原因，命令如下 16:52:22 [rx] 220 XXX.com ESMTP &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/2009/04/24/email_send_successed_but_never_get_it">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">邮件发送提示成功，但是无法接收</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-04-24T00:00:00+08:00" pubdate data-updated="true">Apr 24<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>自己写了一段发送邮件的客户端程序，一直运行良好。可是某天开始，程序发送能提示成功，但是一直接收不到，深感诧异。将笔记本带回家中，程序又运行良好。第二天上班，发现问题依旧。</p>
+<p>随决定使用最原始的telnet命令查看问题原因，命令如下</p>
+<tm lang="shell">
+<p>16:52:22 [rx] 220 <span class="caps">XXX</span>.com <acronym title="EQManager V6.0"><span class="caps">ESMTP</span></acronym> <span class="caps">ESMTP</span><br />
+16:52:22 [tx] <span class="caps">EHLO</span> computer1<br />
+16:52:22 [rx] 250-<span class="caps">XXX</span>.com <acronym title="EQManager V6.0"><span class="caps">ESMTP</span></acronym><br />
+16:52:22 [rx] 250-<span class="caps">STARTTLS</span><br />
+16:52:22 [rx] 250-<span class="caps">AUTH</span> <span class="caps">LOGIN</span> <span class="caps">PLAIN</span><br />
+16:52:22 [rx] 250-<span class="caps">AUTH</span>=<span class="caps">LOGIN</span> <span class="caps">PLAIN</span><br />
+16:52:22 [rx] 250-<span class="caps">PIPELINING</span><br />
+16:52:22 [rx] 250-<span class="caps">SIZE</span> 25530692<br />
+16:52:22 [rx] 250 8BITMIME<br />
+16:52:22 [tx] <span class="caps">AUTH</span> <span class="caps">LOGIN</span><br />
+16:52:22 [rx] 334 VXNlcm5hbWU6<br />
+16:52:22 [tx] e===<br />
+16:52:22 [rx] 334 UGFzc3dvcmQ6<br />
+16:52:22 [tx] N===<br />
+16:52:22 [rx] 235 ok, go ahead (#2.0.0)<br />
+16:52:22 [tx] <span class="caps">MAIL</span> <span class="caps">FROM</span>: &lt;account@XXX.com&gt;<br />
+16:52:22 [rx] 250 ok<br />
+16:52:22 [tx] <span class="caps">RCPT</span> TO: &lt;account@sina.com&gt;<br />
+16:52:22 [rx] 250 ok<br />
+16:52:22 [tx] <span class="caps">DATA</span><br />
+16:52:22 [rx] 354 Send from Rising mail proxy<br />
+16:52:22 [tx] <br />
+.</p>
+</tm>
+<p>执行完DATA命令，发送结束符，然后等待从服务器的信息，等待足够长的时间后，系统提示超时。<br />
+邮件一直发送不成功。看到DATA命令紧跟着 Send from Rising mail proxy，猜测可能与瑞星<br />
+防毒软件有关，之后关闭了瑞星，再次发送，ok，一切正常，所有命令没有任何问题。DATA命令<br />
+也能返回响应，但是登录sina还是接受不到。考虑到网络延时，又等待了20分钟，还是接受不到。<br />
+至此黔驴技穷，无计可施了。遂放弃，回家休息了。</p>
+<p>第二日上班后，登录sina，一下接收了n多封信，至此我的问题解决。</p>
+<p>究其原因<br />
+1.确实是瑞星杀毒软件导致邮件接收不到。因为安装的是网络版，所以回家就关闭了瑞星，到公司<br />
+才打开，解释了为什么在家可以发送成功，而在公司不成功。<br />
+2.sina信箱使用的是免费信箱，上网查找，发现不止我一人，很多使用sina免费信箱的用户都抱怨<br />
+邮件接收延时大，夸张的需要隔一天才可以接收到，可能和他的服务器繁忙有关，当然也可能是不重视<br />
+免费的用户。</p></div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-04-24T00:00:00+08:00" pubdate data-updated="true">Apr 24<span>th</span>, 2009</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://leeseon.github.com/blog/2009/04/24/email_send_successed_but_never_get_it/" data-via="" data-counturl="http://leeseon.github.com/blog/2009/04/24/email_send_successed_but_never_get_it/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009/03/28/there_is_always_time_to_launch_your_dream/" title="Previous Post: 总会有时间来实现你的梦想">&laquo; 总会有时间来实现你的梦想</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2009/05/22/david_heinemeier_hansson_at_startup_school_08/" title="next Post: David Heinemeier Hansson at Startup School 08">David Heinemeier Hansson at Startup School 08 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

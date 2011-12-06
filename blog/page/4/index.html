@@ -1,0 +1,872 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="昨天只是泛泛谈了一下在DreamHost上安装Ruby、Gems与Rails的最简单方法 似乎有点 意犹未尽，决定写个续集，呵呵:) 好吧从哪儿说起呢？嗯，看我注释过的脚本吧，注释应该已经算是说得比较明白了，无它! #修改.bash_profile，设置环境变量GEM_HOME与GEM_PATH &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/page/4">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/10/the_simplest_way_install_ruby_gems_rails_on_dreamhost_2/">在DreamHost上安装Ruby、Gems与Rails的最简单方法之续</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-10T00:00:00+08:00" pubdate data-updated="true">May 10<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">        <p>昨天只是泛泛谈了一下<a href="http://leeseon.com/2008/5/9/the_simplest_way_install_ruby_gems_rails_on_dreamhost">在DreamHost上安装Ruby、Gems与Rails的最简单方法</a> 似乎有点 意犹未尽，决定写个续集，呵呵:)</p>
+
+
+	<p>好吧从哪儿说起呢？嗯，看我注释过的脚本吧，注释应该已经算是说得比较明白了，无它!</p>
+
+<div class="jssc">
+		<ul style="margin-left: 39px;">
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				<span class="ccomment">#修改.bash_profile，设置环境变量GEM_HOME与GEM_PATH
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				<span class="ccomment">#并将~/.gems/bin与~/local/bin加入到查找路径的前端 
+				</span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo&nbsp; <span class="cchar">&#39;export GEM_HOME=&quot;$HOME/.gems&quot;&#39;
+				</span>&nbsp;&gt;&gt; .bash_profile </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo&nbsp; <span class="cchar">&#39;export GEM_PATH=&quot;$GEM_HOME:/usr/lib/ruby/gems/1.8&quot;&#39;
+				</span>&nbsp;&gt;&gt; .bash_profile </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo&nbsp; <span class="cchar">&#39;export PATH=&quot;$HOME/.gems/bin:$PATH&quot;&#39;
+				</span>&nbsp;&gt;&gt; .bash_profile </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo&nbsp; <span class="cchar">&#39;export PATH=&quot;$HOME/local/bin:$PATH&quot;&#39;
+				</span>&nbsp;&gt;&gt; .bash_profile </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				<span class="ccomment">#执行.bash_profile使变量生效 </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				. ~/.bash_profile </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment">#显示PATH变量，仅仅只是为了测试 </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo $PATH </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				<span class="ccomment">#生成gems所需的目录及.gemrc文件，并填充相应内容 </span>
+			</div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				mkdir ~/.gems </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				touch ~/.gemrc </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo gemhome:/home/$(whoami)/.gems &gt;&gt; ~/.gemrc </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo gempath: &gt;&gt; ~/.gemrc </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo -/home/$(whoami)/.gems &gt;&gt; ~/.gemrc </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo -/usr/lib/ruby/gems/1.8&nbsp;&gt;&gt; ~/.gemrc </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># setup directories </span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				mkdir -p ~/local/usr/src/ruby </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd ~/local/usr/src/ruby </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># Install readline </span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				wget <span class="htmlstring">ftp://ftp.cwru.edu/pub/bash/readline-5.2.tar.gz
+				</span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				tar zxvf readline-5<span></span>.2.tar.gz </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd readline-5.2</div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				./configure &#8211;prefix=$HOME/local </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make install </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd .. </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># install ruby </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				wget  <span class="htmlstring">ftp://ftp.ruby-lang.org/pub/ruby/1.8/ruby-1.8.6-p114.tar.gz
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				tar zxvf ruby-1.8.6-p114.tar.gz </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd ruby-1.8.6-p114 </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				./configure &#8211;prefix=$HOME/local &#8211;with-readline-dir=$HOME/local/
+			</div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make install </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd .. </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># fix path </span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				export PATH=$HOME/local/bin:$PATH </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># get rubygems </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				wget  <span class="htmlstring">http://rubyforge.org/frs/download.php/35283/rubygems-1.1.1.tgz
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				tar zxvf rubygems- 1.1.1.tgz
+			</div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd rubygems-1.1.1</div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				$HOME/local/bin/ruby setup.rb config &#8211;prefix=$HOME/local </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				$HOME/local/bin/ruby setup.rb setup </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				$HOME/local/bin/ruby setup.rb install </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd .. </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># Install RAILS </span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				gem install rails </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># Install FastCGI </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				curl -O <span class="htmlstring">http://www.fastcgi.com/dist/fcgi-2.4.0.tar.gz
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				tar xzvf fcgi-2.4.0.tar.gz </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd fcgi-2.4.0</div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				./configure &#8211;prefix=$HOME/local </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make install </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd .. </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># Install FastCGI &amp; MySQL gem packages
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				gem install fcgi &#8211; &#8211;with-fcgi-dir=$HOME/local </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				gem install mysql &#8211; &#8211;with-mysql-config </div>
+			</li>
+		</ul>
+	</div>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/09/the_simplest_way_install_ruby_gems_rails_on_dreamhost/">在DreamHost上安装Ruby、Gems与Rails的最简单方法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-09T00:00:00+08:00" pubdate data-updated="true">May 9<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>其实这篇帖子是一年前就应该写的，当时在&quot;DreamHost&quot;:http://dreamhost.com 上折腾了几天才搞定mephisto，花了两周才搞定depot例子加上gettext汉化的过程。不过人总是好了伤疤忘了痛，而且事后想想也觉得没有什么可说，就不了了之了。而且如今DreamHost也开始进行mod_rails的beta测试了，想来现在才写是有点不太合时宜噢。不过最近又在DreamHost上部署了几个rails应用，不免有也心烦，于是有了旧事重提，朝花夕拾一下的想法。</p>
+<p>不过有一点要声明就是，其实在DreamHost上安装自己的gems其实是并不需要自己安装Ruby的，这两个过程是可以分开的，不过可能是我变态，总喜新厌旧，而且又狂有控制欲，那么大的空间为什么不装一个，而且还可以为ruby打上GC的补丁呢(其实也就是一想，补丁嘛我也没有打过:P，因为现在还用不上的)。</p>
+<p>Ruby装起来很简单，wget一个，解包，编译，安装，将之放入你的路径中就好，不过最好是先编译一份readline为好，以免以后执行script/console会出错，这个不多说，能google出一堆。</p>
+<p>Gems嘛，则需要你建一个本地的安装目录，通常为.gems，并告诉gems知道这个目录的存在，为了这一点你就需要有~目录下生成一个.gemrc的文件，并将你的目录告诉它就好了。当然你也可以如我一样，编译一份最新的rubygems，并将之放入你的查找路径之中就好。</p>
+<p>然后你还需要修改rails的disptch.fcgi文件，让它知道你的ruby与gems目录所在就好。当然其实你也可以使用&quot;GemsOnRails&quot;:http://gemsonrails.rubyforge.org/ 将所有用到的gems放在vendor下，这个就自然不需要自己安装Gems了(rmagick之类的除外)。</p>
+<p>好了，言归正传吧，何以言之我的方法最简单呢？其实是受了&quot;tobi&quot;:tobi 的启发，将所有的安装命令写成一个脚本然后直接执行它就好。不过与他不同的一点是，我在脚本上增加了GEM_HOME与PATH之类的添加与.gemrc文件的生成，真的是一站式搞定。如果你不太懂linux，那你有福了，当然如果你是linux高手，那就让我怡笑大方吧:(</p>
+<p>其实这条命令就是</p>
+<pre>
+<code>
+curl http://leeseon.com/private/allinstall.sh | sh
+</code>
+</pre>
+<p>而已，还算简单吧，嘿嘿</p>
+<p>不过在这之后你的dispatch.fcgi文件还需要将第一行改成,(dispatch.rb也最好改一下,虽然我发现不改也行)</p>
+<pre>
+<code>
+#!/home/your user name/local/bin/ruby
+</code>
+</pre>
+<p>并在require语名之前加上</p>
+<pre>
+<code>
+ENV['RAILS_ENV'] = 'production'
+ENV["GEM_HOME"]="/home/your user name/.gems"
+ENV["GEM_PATH"]="/home/your user name/.gems:/usr/lib/ruby/gems/1.8"
+</code>
+</pre>
+<p>OK,万事搞定，试试吧!</p>
+<p>注:我安装的是现在最新版本的ruby-1.8.6-p114与rubygems-1.1.1<br />
+这个以后会不定时的更新为最新版本</p>
+[tobi]http://blog.leetsoft.com/2005/06/17/installing-rails-made-easy</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/03/haml_another_template_language/">Haml=>不错的选择</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-03T00:00:00+08:00" pubdate data-updated="true">May 3<span>rd</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>使用过Yaml之后，就不再习惯XML，即便有Textmate优秀的补齐功能，我也觉得写起来不甚其烦，毕竟拿来给机器阅读的东东，却用手工来写，总有种左支右拙、捉襟见肘的困顿之感。</p>
+<p>而且有了builder这么神奇的工具，生成一个XML真是件让人舒心的事啊。不用再tag来tag去，而且要时时记得关闭每个tag了。我就曾经试着将生成一个WXS文件(WIX工具的源文件)的VBScript脚本用ruby重写一次，那个爽啊，真的是写完了好久都一直处在兴奋之中，代码简单明快，不用与那烦人的DOM接口打交道，将整个事情还原为一种享受、、、</p>
+<p>言归正传，不再闲扯:P 不过在rails中，当你使用erb这种默认的模板语言时，痛苦又一次袭来，书写模板又一次成为了一件让人厌倦的事，不过好在早就有人困惑于此吧，于是有了&quot;Haml&quot;:http://haml.hamptoncatlin.com/ 当然haml自然也不是什么新东东，早就有人介绍过了，不过最近发现了一个&quot;rspec-haml-scaffold-generator&quot;:generater 与一个Haml的textmate下的&quot;bundle&quot;:bundle ，试用之下觉得不错，推荐大家用用，当然早就用过就不再多说了:( 呵呵，不过总而言之真的是很爽很简单! 只是除了它所说的速度要比原生的erb要慢上30%左右，不过就我的感觉而言，还是不错的，没有太明显的感觉</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/04/28/lost_and_classify/">遗失=>遗忘=>整理=>分类</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-04-28T00:00:00+08:00" pubdate data-updated="true">Apr 28<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>很不幸，发现自己的一块硬盘分区坏了，用了无数种工具搞不定，差点准备手工修复着试试，不过更不幸的是，自己只是觉得里面好象有重要的东西，但是却怎么都想不起来了是什么东东，晕。最终放下心结，格了，修复了一下，继续用吧、、、</p>
+<p>其实人就是这么古怪，拥有的时候，有些熟视无睹，但是失去时，却总有点心存不甘，但是真的能找回，也只觉得不过如此:( 呵呵，好象我又开始感怀人生了^_^ 遗忘有时也不失为一味人生的良药啊</p>
+<p>不过为了亡羊补牢，就利用周未的时间整理了一下硬盘，乖乖，一整吓一跳，结果发现自己的硬盘上的文件真得很乱，两块硬盘，240(160+80)G，被我分了9个区，linux下的两个区不算，自己都搞不清楚哪些文件应该放在哪儿:( 而且发现自己的兴趣也太过广泛，而且收集成狂，自己可能从来不用的软件如Maya，SoftImage都给当了下来，自然还有好多，常常更新的软件，自己却在机器中保留了多个不同时代的恐龙版本。更多的是，那种也就当下来用过一次之后再也没有兴趣的软件也东躲西藏在自己硬盘中。更要命的是电子书真是汗牛充栋，我常常是对着某个关键字进行狂疯搜索，然后将emule中能搜到的都当下来，已经有10张DVD的备份，却其实自己根本没有真的看过其中的几本。</p>
+<p>本着凡是想不起来用处与出处软件删之，凡是觉得以后会去读读的电子书备之的原则，稍稍整理了一下，整个硬盘都清静了，一下多出了70G硬盘空间，其中还不算那个坏掉的分区。按照人可能记忆的极限为7的原则，将分区用PM减少为了七个，其实应该是四个就足矣，不过合并分区太耗时，这个慢慢再来做吧，我可真的不习惯对着电脑无所事事</p>
+<p>在遍览硬盘的过程中，似乎稍有小悟，如果仅仅只是去收集，却从不整理，这些到手的东西，依然不是你的，只有自己<strong>筛选整理、去伪存真，去粗取精，取其精华，去其糟粕</strong>的东东，才是算是你的。靠自己中了老马的流毒太深</p>
+<p>现在已经将自己的文件开始分门别类，好好整理了一番，发现使用cygwin与ruby做这种事真是合适之极，不懂perl的说。</p>
+<p>不过话说回来，其实现在真的是信息太多，而且几乎所有的消耗硬盘的来源都是下载，个人照片算是一部分而已，自己的代码也是更小的部分。NET IS DOWN嘛! 如果平时能在每次下载之时，不是为了一时痛快而且随手乱放，整理与搜索的时间会节约很多的。也的确是细节使人不同啊。</p>
+<p>胡言乱语了半天，发现自己的文字功夫几乎废了，唉，辞不达意啊，将就着看吧</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/04/22/some-git-videos/">Some Git Videos</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-04-22T00:00:00+08:00" pubdate data-updated="true">Apr 22<span>nd</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>从ROR博客&quot;Why Git won&#8217;t mean Rails snubs Windows&quot;:http://weblog.rubyonrails.org/2008/4/3/why-git-won-t-mean-rails-snubs-windows 的注释中看到了几个有趣的视频链接，看了一下强烈推荐，尤其是第一个:</p>
+<p><strong>Tech Talk: Linus Torvalds on git</strong></p>
+<p><object type="application/x-shockwave-flash" style="width:425px; height:355px;" data="http://www.youtube.com/v/4XpnKHJAok8"><br />
+<param name="movie" value="http://www.youtube.com/v/4XpnKHJAok8" /><br />
+</object><div style="font-size: 0.8em"><a href="http://www.tools4noobs.com/online_tools/youtube_xhtml/">Get your own valid <span class="caps">XHTML</span> YouTube embed code</a></div></p>
+<p><strong>Git with Rails and Capistrano</strong></p>
+<p><object type="application/x-shockwave-flash" width="400" height="265" data="http://www.vimeo.com/moogaloop.swf?clip_id=369095&amp;server=www.vimeo.com&amp;fullscreen=1&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=">	<param name="quality" value="best" />	<param name="allowfullscreen" value="true" />	<param name="scale" value="showAll" />	<param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=369095&amp;server=www.vimeo.com&amp;fullscreen=1&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=" /></object><br /><a href="http://www.vimeo.com/369095/l:embed_369095">Git with Rails Tutorial</a> from <a href="http://www.vimeo.com/chacon/l:embed_369095">Scott Chacon</a> on <a href="http://vimeo.com/l:embed_369095">Vimeo</a>.</p>
+<p><strong>Randal Schwartz on Git</strong><br />
+可惜不能内嵌，链接如下:<br />
+<a href="http://www.youtube.com/watch?v=8dhZ9BXQgc4">http://www.youtube.com/watch?v=8dhZ9BXQgc4#</a></p>
+<p>#</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/04/15/rubygems_update_behind_ntlm_proxy/">NT域内网中的gems更新</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-04-15T00:00:00+08:00" pubdate data-updated="true">Apr 15<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>如果你如我一样，不是在一家以纯Mac或Linux/Unix环境下的公司上班，而且很不幸通过在基于NT域之上的代理上网的话，你就可能遇到gem更新的问题</p>
+<p>虽然你总可以通过浏览器下载所有的gem然后一个一个的手动安装，但不管怎样，这都是一个很没有效率的事，不是吗？</p>
+<p>当然，你自然是可以找到RubyGems上的FAQ中的&quot;提示&quot;:http://www.rubygems.org/read/chapter/15#page67 通过一个基于python的称之为APServer的工具再建一个Basic authentication代理，然后基于它搞定这一切。</p>
+<p>可惜的是，你可能会遇到如我一般的问题，&quot;http://apserver.sf.net&quot;:http://apserver.sf.net 不能打开，你现在只能看到一堆无用的错误提示，晕死:(</p>
+<p>不过幸好我经过一番不懈的努力(本来想寻找其它的解决方案)，居然发现了另一个url是指向同一个工程的：&quot;http://ntlmaps.sourceforge.net/&quot;:http://ntlmaps.sourceforge.net/ 两者只是名字不同而已:)</p>
+<p>不过更有趣的事自然是在后头，有人更进一步的通过APServer与Tor及SocksCap32组建了一个完整的上网环境，使得在办公室里使用emule都成为了可能，呵呵，有兴趣的可以看一下&quot;这里&quot;:here</p>
+<p>不过一般我是不会在办公室里使用emule的，毕竟这种lowID是比较慢的，不过知道有这种可能也是不错的</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/04/14/some_news_of_ruby/">最近ruby二三事</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-04-14T00:00:00+08:00" pubdate data-updated="true">Apr 14<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近这两周，ruby社区接连有几件大事发生:</p>
+<p>当仁不让最火爆的自然是&quot;GitHub&quot;:http://github.com/ 的正式上线，DHH称之为一个&quot;killer application&quot;.</p>
+<p>此外，就因为是这两天众望所归的&quot;mod_rails&quot;:http://www.modrails.com/ 的realse. 虽然robbin对它在VPS上的前景&quot;不太看好&quot;:http://robbin.javaeye.com/blog/182312 ，但是在dreamhost之类的共享主机上倒是前途远大，而且apache老矣的诊断我还觉得有点为时过早。</p>
+<p>与这两件相比JRuby1.1与HotRuby 及RubyJS之类的新闻都不那么让人激动了。</p>
+<p>总得来说，ruby现在越来越开始走向工业化的前端了，rails与git的结合让我看到一个新的开源社区的前景。mod_rails则开始着手于，一开始让人诟病的rails的部署不如PHP简单明了的问题。而且现在的ruby也越来越VM化了。</p>
+<p>PS：今天有点头痛，词不达意，先下，再写</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/04/07/update_to_mephisto0-8/">升级到mephisto 0.8</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-04-07T00:00:00+08:00" pubdate data-updated="true">Apr 7<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>昨天有空，将我的mephisto升级到了0.8</p>
+<p>虽然官网上并没有发布mephisto 0.8不过很多人已经在&quot;blog&quot;:http://www.caboo.se/articles/2008/2/3/mephisto-0-8 中提到了它，通过git是可以获得它的</p>
+<p>命令如下:<br />
+<pre><br />
+<code>
+git clone git://activereload.net/mephisto.git mephisto
+</code><br />
+</pre></p>
+<p>话说这个&quot;git&quot;:http://git.or.cz/ 可是系出名门，由*Linus Torvalds*在不满于现有的源代码版本系统后亲手打造，一开始是用于linux kernel，现在rails、rubinius及mephisto也是使用它作为版本管理工具。</p>
+<p>不过git一开始就没有一个专门for windows的版本，要使用也只能在cygwin中使用，不过现在在google code上有一个项目&quot;msysgit&quot;:http://code.google.com/p/msysgit/ 可以作为另一种选择，不用安装cygwin也可以使用git。</p>
+<p>说实话，我倒是的确没有太发现mephisto 0.8到0.7.3的感观上有多大区别，仅仅只是支持rails 2.0.2 和一些gems有所变化。</p>
+<p>不过升级一下的一个好处是可以支持一个&quot;比较新的sitemap插件&quot;:http://www.appelsiini.net/projects/mephisto_sitemap</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/03/31/April_Fool_Joke/">美国式的幽默</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-03-31T00:00:00+08:00" pubdate data-updated="true">Mar 31<span>st</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>今天看到&quot;SpringSource Announces Acquisition by Microsoft&quot;:http://www.infoq.com/news/2008/04/microsoft-springsource-purchase 本来还很郁闷，想Microsoft疯了，买一个Java Framework公司做什么，还居然出与mysql一样的价。不是说Spring不值钱，只是看来卖给谁与拿来怎样用。</p>
+<p>不过看到下面的注释才明白，应该就是一个典型的April Fool Joke. 不过上次gmail的2G的惊喜倒是一次很成功的营销活动。真是真真假假才别有趣味。</p>
+<p>另:怀念哥哥一下，离开我们已经5年了，时间真是TMD的快啊，比长脚还快</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/03/27/being_interesting/">事情开始变得有趣</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-03-27T00:00:00+08:00" pubdate data-updated="true">Mar 27<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>本以为公司的windows与office总是买了的，没有想到今天收到邮件，让用XP的报名统计一下(预装的系统是win2000)，让大家开始安装ThunderBird与openoffice，并且会在周末将exchange换成linux。</p>
+<p>事情开始有趣起来，看来外资公司的想法就是比较独特，没有管时自然是随便用，但是有人管时，也懒得走政府路线，咱能用免费的就用免费的，不能用的咱就买，一劳永逸，嘿嘿。</p>
+<p>这也是我写上篇blog时所说的对于MS来说最可怕的事，MS的产品不再是不可取代，哪怕不可取代也开始慢慢的边缘化了起来。不上网不行，但是没有windows是没有什么问题的，毕竟我在家用ubuntu也没有什么太多的不习惯;)</p>
+<p>现实有时比较想象的要有趣得多，看来生活中真的不缺少幽默，这是趋势，也是时代的车轮，我想MS也开始感到了被碾轧的痛苦了吧</p></div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/5/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/3/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

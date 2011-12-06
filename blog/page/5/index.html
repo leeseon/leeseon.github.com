@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="闲读mephisto的代码，发现其中N多地方用到returning，看着很怪，难道又多出了一个关键字？
+grep一下，自然不是，这个是源自active_support\core_ext\object\misc.rb: Class Object def returning(value) yield( &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://leeseon.github.com/blog/page/5">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:leeseon.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/03/24/ruby_and_k-combinator/">Ruby 及 K-combinator</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-03-24T00:00:00+08:00" pubdate data-updated="true">Mar 24<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>闲读mephisto的代码，发现其中N多地方用到returning，看着很怪，难道又多出了一个关键字？</p>
+<p>grep一下，自然不是，这个是源自active_support\core_ext\object\misc.rb:<br />
+<pre><br />
+<code>
+Class Object
+  def returning(value)
+    yield(value)
+    value
+  end
+end
+</code><br />
+</pre></p>
+<p>粗看之下，极其简单无甚好说，但是为什么会这样用？又是一个idiom？</p>
+<p>google之，却发现绝不简单，正如它的注释所说这是一个“ A Ruby-ized realization of the K combinator, courtesy of Mikael Brockman.”</p>
+<p>在&quot;这里&quot;:http://weblog.jamisbuck.org/2006/10/27/mining-activesupport-object-returning  发现了我心不孤，也有人大大感吧了一番了Brockman的天才想法。</p>
+<p>本人词拙，还是半译半抄Jamis的解释吧：</p>
+<p>Basically, the K combinator is a function of two arguments, that merely returns the first argument. The second argument is useful only for the side-effects it has on the first argument. The implementation of this in Ruby is beautifully succinct:</p>
+<p>简单的说， K组合子是一个有两个参数的函数，它仅仅是直接返回第一个参数。而第二个参数唯一个作用就是对第一个参数增加点付作用(修改)。由此可见，它的Ruby实现是如何的简洁了。(几乎无一字可减，很强很简洁)</p>
+<p>当然如果你对ruby的语法不是太熟，可能还是不能体会出其中的真意，所以Jamis又解释道：</p>
+<p>It takes a value (the first argument), yields it to the associated block (the implicit second argument), and then returns the value. The block is used to operate on the first argument, and thus (by its side-effects) provides the actual work of this method.</p>
+<p>returning函数，将value(第一个参数)应用(yield)到与之关联的block上(block其实就是隐含的第二个参数)，然后返回value. 其中block只是用来对第一个参数进行操作，通过这种(付作用/修改)也就完成了方法真正的工作。</p>
+<p>噢，如果你还与我一样依然对这个K combinator怀有好奇心的话，可以继续google之，才发现这个K也是很不简单的滴，它来源于那让人费解的SKI combinator中的第二个。</p>
+<p>SKI的伟大之处，在于证明了所有的函数都是可以被分解为S与K的。读到这里你否有一点灵光一闪？我靠，这不是与所有的计算都能还原这一个加法器这一原理般似曾相识？还有那让人头痛了很久了ackman函数、、、</p>
+<p>唉，伟大的数学家啊，唉，牛B的ruby与Brockman</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/03/24/pirated_microsoft_and_WEB/">盗版、微软=>WEB</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-03-24T00:00:00+08:00" pubdate data-updated="true">Mar 24<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>今天公司来了一堆人，说是文化局与公安局的一个专办来查盗版的，虽然在执法过程中，这堆牛人体现出良好的粗暴执法的素质，但是能采集的证据也是采集到了。虽说公司是一家外资独资的，而且大家都是圈子里的人，应该产权意识很强的，可是到了中国还是变了点味，毕竟高昂的Photoshop与3DMax类的软件的费用比windows与office高到老鼻子去了，能省就省吧，而且在中国就得入乡随俗，而且中国人自有中国人自己的办法的:)</p>
+<p>不过我要说的不是这个，自己也是软件人，为了行业的健康发展，正版我总是支持的嘛!只是今天在还有检查到我之前，我已经很安心的删除了VS2005与一个临时拿来玩一下的3DMAX到一边凉快去了。然后你再再看看我的电脑，你再翻来翻去，都是找不到盗版的踪迹的。</p>
+<p>毕竟需要专用的东东都已经买过了，windows与office要买的人都早已买过了。Code Warrior之类自然是买过的，其它游戏平台的SDK，一般要不是免费，要不就是不经授权，你找都找不到的：P</p>
+<p>VS用express也就行了，而且它本来也不贵，而且不算必需，反而是gcc的工具链是必须的，不过用cygwin就能得到了。</p>
+<p>除了那些有着明显行业背景的软件，你发现你真的与MS无关了，我认识的泡泡同学用MAC很久了，早就成了一个用MS无关的人，而且我在家用着ubuntu，除了字体让我不爽(美化过的)之外，只有不能上银行网让我心烦了，其它都很好。</p>
+<p>如果我以后用rails谋生的话，可能只有TextMate可以让我有用盗版的冲动，当然我是不会为了这39欧而且使用盗版的了:) 毕竟120$左右的Dreamhost我也是续了费的(懒得动，虽然开始觉得site5不错)</p>
+<p>如果用java谋生，好象真的就免了所有的盗版之说，毕竟BEA之类的东东，不用在家用的。</p>
+<p>除了工作之外，我每天最多的时间都在与浏览器打交道，无论是googling、bloging、tudouing，总是在WEB来WEB去，与OS与Application真的无关了。哪怕有点私事，用openoffice也是可以搞定的。</p>
+<p>我想这种变化也是MS最担心的了，要不它不会急着要将yahoo收入旗下了，不过我总觉得MS骨子里没有WEB的基因，它的live就是一个太显眼不过的证明、、、</p>
+<p>嘿嘿，<strong>I am bloging!</strong></p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/03/20/look_back_and_forth/">回首=>开始</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-03-20T00:00:00+08:00" pubdate data-updated="true">Mar 20<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>开年上班的第一天，辞了工作，休息了三天，去新公司报到!</p>
+<p>仔细想想这几年，因为自己的懒散，从中获得的并不多，除了完成自己的工作，自己并没有太多的进步。</p>
+<p>离行业很远，离自己喜欢的JAVA也很远，技术长进不大，英语嘛早就忘光了。朋友认识了几个，情感还算有些进步。一直呆在公司两年多，只是为了一个自己知道，但是却不能说的理由，唉!</p>
+<p>重新找工作时写简历，居然自己觉得无甚可写，泛泛的说自己熟悉设计模式与面向对象之类的话很无趣，但想想自己也就只有这点特长，一无可以说一下的产品与项目，二无参加开源社区与论坛的贡献，三无译作与文章。想来与自己当初刚毕业来北京时的雄心壮志相差太远。</p>
+<p>虽然因为简历<strong>写得</strong>还算过得去，有几家猎头找到了我，但是因为可怜的英语，与最想去的ThoughtWorks是没有去成，连MS与IBM也没有机会，Google嘛就更不用提了。现在这家公司是做游戏的，其实也还有趣，算是一个继续练习英语的地方好了。</p>
+<p>不过经过这就跳槽，也从中发现了自己的不足，好好的回想了一下自己的过去，现在是一个好好的开始的时候了。认真的给自己一个定位，一个明确有职业目标是重新开始的重中之重。</p>
+<p>所幸的是，也非一无所得：遇到了一个值得自己喜欢的女人，有了一份让我期待的感情；遭遇了一门有趣的语言，有了一段让我惊喜的乐趣。</p>
+<p>晚了，先睡，明天又将是一段新的开始。</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/03/13/%E5%85%AC%E5%8F%B8%E6%90%AC%E8%BF%81%EF%BC%81%E7%97%85%E6%80%81%E6%94%BF%E6%B2%BB%EF%BC%9F/">公司搬迁！病态政治？</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2007-03-13T00:00:00+08:00" pubdate data-updated="true">Mar 13<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>公司要搬迁了，3000多号人要一下了再向北搬八公里，到一个鸟不生蛋的地方：（</p>
+<p>我在脑海中冒出的第一个想法，就是《人件》中对于“特别病例分析：公司搬迁”的论述。这又让我联想到一年前的一天，当我与同事们听我们的主设对我们讲他制定的设计模板时的情景，可爱的泡泡同事脱口而出的《最后期限》中的那句，这不是文案吗？哈哈，真是怀念泡泡啊。可能人的第一反应就是最真实的想法，虽然不一定要什么逻辑，但是却往往是最正确的想法。</p>
+<p>也许吧，可能是我居心不良，总感觉这是一个毁掉一个公司的不二法门!噢，不用想，在第一阵新鲜过后，在应对了搬迁之后的混乱与兴奋之后，当所有的事都开始慢慢走上正轨，接踵而来的肯定是又一轮人员流动的高潮吧。也许也许，希望不要被我说中。</p>
+<p>TOM在《人件》中好象从来都不忌惮用最坏的用心来猜测管理者的想法：“对于没有安全感的经理而言，没有比将公司搬迁到遥远的地方更能满足自我追逐名利的行为方式了。这是最典型的不择手段，给员工的生活注入如此之多的痛苦使经理的感觉简直像上帝一样。”，“有时只是赤祼裸的权力运用而已。”</p>
+<p>当然TOM也提到在20世纪50&#8217;s与60’s搬迁是可能的，但今天却是件愚蠢的事。呵呵，TOM是对的，也许我们现在真的所处的业界古老于美国的50-60&#8217;S吧。这样搬迁当然是可能的，也说不定是明确的选择。毕竟员工的痛苦算得了什么，那可是一片肥沃的土地，可以带来更多的管理层面的利润、、、很可能搬家的那一天，就是股票疯长的一天。</p>
+<p>当然也许是我危言耸听，其实搬迁可能造成的人员流动之类，对于公司从来都不是一个问题，甚至从来都不是一个值得关注的问题。搬迁的后果是可能会毁掉一个胶冻的团队，但是如果根本没有什么胶冻起的团队，那这又算得了什么嘛！毕竟我们现在只是因为工作而活在一堆人之间，team? No,group而已！而且微软不是也搬过一次家吗？而且现在在Remond不是也好好的成为了软件世界的伟大的一极吗？</p>
+<p>好吧，好吧，希望一切都是我的小人之心而已，反正我也会在看完热闹之后，开心的溜掉。拭目以待吧，说不定那儿又是一个Remond的开端，并不是每个公司都会倒霉得象1966年的AT＆T一样的。</p></div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/4/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/07/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/only_for_technorati_post_claim/">Only for Technorati Post Claim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/05/china-national-website-maintenance-day/">贴图不说话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/06/15/a_litter_opinions_on_my_two_years_mobile_game_devolopment_experience/">说说我在手机游戏行业这两年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2010/01/16/bye_bye_dreamhost/">ByeBye Dreamhost</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
