@@ -1,0 +1,17 @@
+--- 
+layout: post
+title: running on rails-----在铁轨上奔跑速度自然就会快:P
+disqus_id: /2008/6/5/running_on_rails
+categories: 
+  []
+---
+
+
+最近一直忙于工作，居然有两周没有写blog了，不过也不是完全没有时间写，只是因为实在是没有什么时间来实践rails上的一些新东东，觉得言之无物:(
+
+不过ruby/rails社区最近却是如大事连连：先是rails 2.1的发布，还有就是ironruby在rubinius之后也宣布可以运行rails了，这个所有ruby实现都视之为重要目标的里程碑。
+
+一旦运行上了轨道，后面自然是一发而不可收拾噢，虽然我对ironruby的兴趣缺缺的说
+
+只是偶然发现ruby on rails的这个名字真的很有趣，以至于我自己能生造出Running On Rails这样古怪的半通不通的双关来，算是玩笑吧:P
+

@@ -1,0 +1,19 @@
+--- 
+layout: post
+title: Haml=>不错的选择
+disqus_id: /2008/5/3/haml_another_template_language
+categories: 
+  []
+---
+
+
+使用过Yaml之后，就不再习惯XML，即便有Textmate优秀的补齐功能，我也觉得写起来不甚其烦，毕竟拿来给机器阅读的东东，却用手工来写，总有种左支右拙、捉襟见肘的困顿之感。
+
+而且有了builder这么神奇的工具，生成一个XML真是件让人舒心的事啊。不用再tag来tag去，而且要时时记得关闭每个tag了。我就曾经试着将生成一个WXS文件(WIX工具的源文件)的VBScript脚本用ruby重写一次，那个爽啊，真的是写完了好久都一直处在兴奋之中，代码简单明快，不用与那烦人的DOM接口打交道，将整个事情还原为一种享受、、、
+
+言归正传，不再闲扯:P 不过在rails中，当你使用erb这种默认的模板语言时，痛苦又一次袭来，书写模板又一次成为了一件让人厌倦的事，不过好在早就有人困惑于此吧，于是有了"Haml":http://haml.hamptoncatlin.com/ 当然haml自然也不是什么新东东，早就有人介绍过了，不过最近发现了一个"rspec-haml-scaffold-generator":generater 与一个Haml的textmate下的"bundle":bundle ，试用之下觉得不错，推荐大家用用，当然早就用过就不再多说了:( 呵呵，不过总而言之真的是很爽很简单! 只是除了它所说的速度要比原生的erb要慢上30%左右，不过就我的感觉而言，还是不错的，没有太明显的感觉
+
+[generater]http://blog.citrusbyte.com/2008/03/11/whats-that-rspec-haml-scaffolds-yes-it-is/
+
+[bundle]http://bjhess.com/bjhessblog/2007/05/31/installing-haml-bundle-for-textmate/
+

@@ -1,0 +1,15 @@
+--- 
+layout: post
+title: 美国式的幽默
+disqus_id: /2008/3/31/April_Fool_Joke
+categories: 
+  []
+---
+
+
+今天看到"SpringSource Announces Acquisition by Microsoft":http://www.infoq.com/news/2008/04/microsoft-springsource-purchase 本来还很郁闷，想Microsoft疯了，买一个Java Framework公司做什么，还居然出与mysql一样的价。不是说Spring不值钱，只是看来卖给谁与拿来怎样用。
+
+不过看到下面的注释才明白，应该就是一个典型的April Fool Joke. 不过上次gmail的2G的惊喜倒是一次很成功的营销活动。真是真真假假才别有趣味。
+
+另:怀念哥哥一下，离开我们已经5年了，时间真是TMD的快啊，比长脚还快
+

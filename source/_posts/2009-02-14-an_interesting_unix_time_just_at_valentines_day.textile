@@ -1,0 +1,22 @@
+--- 
+layout: post
+title: 有趣的情人节时间密码
+disqus_id: /2009/2/14/an_interesting_unix_time_just_at_valentines_day
+categories: 
+  []
+---
+
+
+<tm lang="ruby">
+require 'rubygems'
+require 'active_support'
+
+Time.at 1234567890 # => Sat Feb 14 07:31:30 +0800 2009
+
+Time.zone = "Beijing" # => "Beijing"
+
+Time.zone.at 1234567890 # => Sat, 14 Feb 2009 07:31:30 CST +08:00
+</tm>
+
+可惜今天一天都在加班，早上6:30才回，倒头就睡了，在不知不觉中就已经错过了这个有趣时间:(
+

@@ -1,0 +1,29 @@
+--- 
+layout: post
+title: Some Git Videos
+disqus_id: /2008/4/22/some-git-videos
+categories: 
+  []
+---
+
+
+从ROR博客"Why Git won't mean Rails snubs Windows":http://weblog.rubyonrails.org/2008/4/3/why-git-won-t-mean-rails-snubs-windows 的注释中看到了几个有趣的视频链接，看了一下强烈推荐，尤其是第一个:
+
+<strong>Tech Talk: Linus Torvalds on git</strong>
+
+<object type="application/x-shockwave-flash" style="width:425px; height:355px;" data="http://www.youtube.com/v/4XpnKHJAok8">
+<param name="movie" value="http://www.youtube.com/v/4XpnKHJAok8" />
+</object><div style="font-size: 0.8em"><a href="http://www.tools4noobs.com/online_tools/youtube_xhtml/">Get your own valid XHTML YouTube embed code</a></div>
+
+<strong>Git with Rails and Capistrano</strong>
+
+<object type="application/x-shockwave-flash" width="400" height="265" data="http://www.vimeo.com/moogaloop.swf?clip_id=369095&amp;server=www.vimeo.com&amp;fullscreen=1&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=">	<param name="quality" value="best" />	<param name="allowfullscreen" value="true" />	<param name="scale" value="showAll" />	<param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=369095&amp;server=www.vimeo.com&amp;fullscreen=1&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=" /></object><br /><a href="http://www.vimeo.com/369095/l:embed_369095">Git with Rails Tutorial</a> from <a href="http://www.vimeo.com/chacon/l:embed_369095">Scott Chacon</a> on <a href="http://vimeo.com/l:embed_369095">Vimeo</a>.
+
+
+
+<strong>Randal Schwartz on Git</strong>
+可惜不能内嵌，链接如下:
+"http://www.youtube.com/watch?v=8dhZ9BXQgc4#":git
+
+[git]http://www.youtube.com/watch?v=8dhZ9BXQgc4#
+

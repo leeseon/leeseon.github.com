@@ -1,0 +1,16 @@
+--- 
+layout: post
+title: Rails/Ruby社区越来越快了
+disqus_id: /2008/6/22/rails_ruby_community_faster_and_faster
+categories: 
+  []
+---
+
+
+Rails在6.1号就已经发布2.1了，这个号称参与人数最多，代码更改行数最多的版本，就这么漫不经心地来了。最近gems也发布1.2了，而且中文版本的《what's new in rails 2.1》也基本上在网络上翻译好了，rails的社区参与度与活跃度也最来最高了，这样的rails/ruby社区怎能不越来越快？
+
+最近依然在忙碌中度过，上来写写博文只能算是应个景儿，有点对不起自己了:(
+
+
+
+

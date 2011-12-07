@@ -1,0 +1,47 @@
+--- 
+layout: post
+title: Ruby 及 K-combinator
+disqus_id: /2008/3/24/ruby_and_k-combinator
+categories: 
+  []
+---
+
+
+闲读mephisto的代码，发现其中N多地方用到returning，看着很怪，难道又多出了一个关键字？
+
+grep一下，自然不是，这个是源自active_support\core_ext\object\misc.rb:
+<pre>
+<code>
+Class Object
+  def returning(value)
+    yield(value)
+    value
+  end
+end
+</code>
+</pre>
+
+粗看之下，极其简单无甚好说，但是为什么会这样用？又是一个idiom？
+
+google之，却发现绝不简单，正如它的注释所说这是一个“ A Ruby-ized realization of the K combinator, courtesy of Mikael Brockman.”
+
+在"这里":http://weblog.jamisbuck.org/2006/10/27/mining-activesupport-object-returning  发现了我心不孤，也有人大大感吧了一番了Brockman的天才想法。
+
+本人词拙，还是半译半抄Jamis的解释吧：
+
+Basically, the K combinator is a function of two arguments, that merely returns the first argument. The second argument is useful only for the side-effects it has on the first argument. The implementation of this in Ruby is beautifully succinct:
+
+简单的说， K组合子是一个有两个参数的函数，它仅仅是直接返回第一个参数。而第二个参数唯一个作用就是对第一个参数增加点付作用(修改)。由此可见，它的Ruby实现是如何的简洁了。(几乎无一字可减，很强很简洁)
+
+当然如果你对ruby的语法不是太熟，可能还是不能体会出其中的真意，所以Jamis又解释道：
+
+It takes a value (the first argument), yields it to the associated block (the implicit second argument), and then returns the value. The block is used to operate on the first argument, and thus (by its side-effects) provides the actual work of this method.
+
+returning函数，将value(第一个参数)应用(yield)到与之关联的block上(block其实就是隐含的第二个参数)，然后返回value. 其中block只是用来对第一个参数进行操作，通过这种(付作用/修改)也就完成了方法真正的工作。
+
+噢，如果你还与我一样依然对这个K combinator怀有好奇心的话，可以继续google之，才发现这个K也是很不简单的滴，它来源于那让人费解的SKI combinator中的第二个。
+
+SKI的伟大之处，在于证明了所有的函数都是可以被分解为S与K的。读到这里你否有一点灵光一闪？我靠，这不是与所有的计算都能还原这一个加法器这一原理般似曾相识？还有那让人头痛了很久了ackman函数、、、
+
+唉，伟大的数学家啊，唉，牛B的ruby与Brockman
+

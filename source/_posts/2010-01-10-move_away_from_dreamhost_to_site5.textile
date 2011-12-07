@@ -1,0 +1,30 @@
+--- 
+layout: post
+title: 搬家成功Dreamhost=>Site5
+disqus_id: /2010/1/10/move_away_from_dreamhost_to_site5
+categories: 
+  []
+---
+
+
+!/assets/leeseon.com/2010/1/10/promo-save-35-instantly-sprsum.png!
+
+其实早在几个月前，当我的"new relic":http://www.newrelic.com/ 发给我的报告表明在Dreamhost上的得分从fair到了poor与让我很不爽的Unacceptable之后，又鉴于已有的"前例":learning ，我已经另寻乐土之意。
+
+赶在美国传统的打折季，新年动手吧，反正离我的dreamhost的过期时间有不到两个月的时间了。对于"Linode":http://www.linode.com 我虽然很有向往，但是对于自己的需求来说，VPS的价格还是偏高。因此在shared的主机中选择是比较正常的，其实一开始我并没有直奔"Site5":http://site5.com 而已，而是绕了个小弯去试试一下"HostMonster":http://www.hostmonster.com/ 因为它打折之后$4.95/m的价格还是很让我心动的，不过在试用的感觉中我感觉可能是因为被dreamhost上ssh的方便给惯坏了，它需要身份验证(发个身份证的照片过去)才能开ssh的默认流程，就让我有预感HostMonster可能与rails不合，而且它那繁复的控制界面让我比较头大，试用了三天就直接要求退款了，好在它退款还是很方便。教训是没有关注一下rails社区对它的评价。这年头国内国外谈论的居然都是"Linode":http://www.linode.com 与"slicehost":http://www.slicehost.com/ 甚至"joynet":http://www.joyent.com/ 。我就一个想要找个地方hosting自己的mephisto偶尔玩一下rails的小网民容易吗？
+
+有了这次教训，最后也就选中了"Site5":site5 ：SSH自动开启也算是我想要的，总体上来说$9.95/m的费用是与dreamhost相当的，不过因为我当年曾经将dreamhost的空间一起与"LiuFeng":liufeng 分享，所以还是与它商量了一下，我们一起合租site5了，我出hostpro的价钱，他出turbo的费用。这样我们就又可以一起合租了，而且还额外得到了一个独立IP，的确是一个很好的方案噢。
+
+虽然Site5本来就有60天回款的保证，但是为了麻烦，我还是使用了一个可以试用30天的coupon，不过事后证明这一步好象是多余的，因为我一开始试用就开始喜欢上site5了，居然它已经为你建立好一个/home/username/ruby/gems，而且还有一个已经写得不太完整的.gemrc。噢，看来site5为rails的用户已经想得足够多了。
+
+至于site5的好处，liufeng已经在"这里":this 讲过了，我就不多说了，只记得他当时太兴奋，在gtalk里面也不停的说site5的好处。对我而言最深的感受，它的网速与机器速度很快，我最喜欢的是它的live chat的客户支持，虽然我的英文足够糟到可以让它的客服刚好了解我要说什么，但是他们总是能很耐心且及时的解答我的很多问题，比起Dreamhost糟糕的live chat系统要好上太多了。
+
+其实我是在中国时区的25号使用了一个30%折扣购买了一年的hostPro+Turbo主机计划，但是就是一个小时之后，就发现的主页上的折扣因为圣诞促销变成了35%，杯具啊。感觉就象被玩弄了一般，在我有点恼羞成怒地急躁的与Site5的交涉之后，他们居然很大方的答应将5%直接refund给我，呵呵，这种感觉让我一下子喜欢上了Site5。
+
+就算了是site5没有其它好过dreamhost太多的优点，我也会因为这一点而喜欢site5的。噢噢
+
+[liufeng]http://blog.cnliufeng.com/
+[site5]http://www.site5.com/in.php?id=78968-43
+[learning]http://www.robinlu.com/blog/archives/475
+[this]http://www.cnliufeng.com/blog/2009/12/exciting.html
+

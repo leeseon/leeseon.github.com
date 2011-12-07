@@ -1,0 +1,30 @@
+--- 
+layout: post
+title: 升级到mephisto 0.8
+disqus_id: /2008/4/7/update_to_mephisto0-8
+categories: 
+  []
+---
+
+
+昨天有空，将我的mephisto升级到了0.8
+
+虽然官网上并没有发布mephisto 0.8不过很多人已经在"blog":http://www.caboo.se/articles/2008/2/3/mephisto-0-8 中提到了它，通过git是可以获得它的
+
+命令如下:
+<pre>
+<code>
+git clone git://activereload.net/mephisto.git mephisto
+</code>
+</pre>
+
+话说这个"git":http://git.or.cz/ 可是系出名门，由*Linus Torvalds*在不满于现有的源代码版本系统后亲手打造，一开始是用于linux kernel，现在rails、rubinius及mephisto也是使用它作为版本管理工具。
+
+不过git一开始就没有一个专门for windows的版本，要使用也只能在cygwin中使用，不过现在在google code上有一个项目"msysgit":http://code.google.com/p/msysgit/ 可以作为另一种选择，不用安装cygwin也可以使用git。
+
+说实话，我倒是的确没有太发现mephisto 0.8到0.7.3的感观上有多大区别，仅仅只是支持rails 2.0.2 和一些gems有所变化。
+
+不过升级一下的一个好处是可以支持一个"比较新的sitemap插件":http://www.appelsiini.net/projects/mephisto_sitemap
+
+
+

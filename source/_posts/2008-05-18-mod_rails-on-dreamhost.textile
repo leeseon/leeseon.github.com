@@ -1,0 +1,30 @@
+--- 
+layout: post
+title: dreamhost真的开始支持mod_rails了
+disqus_id: /2008/5/18/mod_rails-on-dreamhost
+categories: 
+  []
+---
+
+
+呵呵，这个当然是好事，只可惜我"一语成谶":chen ， 正好在"DreamHost":http://www.dreamhost.com 支持mod_rails的两天之前写了两篇关于怎样在dreamhost上安装ruby、rails与gems的"blog":blog,  当然现在这些东东已经过期了，不再有用了，看来以后有什么心得就需要立刻记下来，第一为了免得稍纵即逝错过了最想记录下来的冲动时刻，第二也许我早点写出来，可能会对大家更有用，起码能让后来者少起点弯路（有点自以为的是地想）。当然做我们这么行，知识的过期是再正常不过的了，不过当年在那儿探索的苦恼与成功之后的喜悦是不可能忘却的，而且从中学到的一些东西也并不是全无用处，比如虽然有了mod_rails但是当你需要自己的gems时，还是可以自己装一份来用的嘛，只是不会再遇到我所遇到的那些莫名的
+<strong>
+FastCGI: comm with (dynamic) server "/home/u/domain/public/dispatch.fcgi" aborted: (first read) idle timeout (60 sec)
+</strong>
+的挫折了，这自然是好事噢，有点不甘心地说:P
+
+嗯，如dreamhost所说一般以domain的控制面板上多了一个Ruby on Rails Passenger的选项，勾上就好了，简单得不行了吧，不过有一点要注意，dispatch.fcgi中的代码将会永远用不到了，所以如果如我一般自己安装了gems的并有dispatch.fcgi中配置了gems的路径的话，就需要将
+
+<pre>
+<code>
+ENV["GEM_HOME"]="/home/yourusername/.gems"
+ENV["GEM_PATH"]="/home/yourusername/.gems:/usr/lib/ruby/gems/1.8"
+</code>
+</pre>
+
+移到config/enviroment.rb中的ENV['RAILS_ENV'] ||= 'production'之后就好了，否则可能会看到一个mod_rails提示的出错页面，无它，很简单的，不错
+
+[chen]http://leeseon.com/2008/5/9/the_simplest_way_install_ruby_gems_rails_on_dreamhost
+[blog]http://leeseon.com/2008/5/10/the_simplest_way_install_ruby_gems_rails_on_dreamhost_2
+[news]http://www.infoq.com/cn/news/2008/05/rails-deployment-roundup
+

@@ -1,0 +1,49 @@
+--- 
+layout: post
+title: 将mysql数据导入到sqlite中
+disqus_id: /2009/2/17/export_mysql_data_to_sqlite3_for_rails
+categories: 
+  []
+---
+
+
+自"rails":http://www.rubyonrails.org 2.0将默认配置的数据库改成"sqlite":http://www.sqlite.org 之后，我才真的开始使用这个"self-contained, serverless, zero-configuration, transactional"小巧，轻便的嵌入式的数据库、、、以下省去 溢美之词n多字
+
+不对sqlite对我来说最大的好处就是不用安装与启动服务，完全就是一个绿色版，只要拷贝过来，放在路径之下就能直接使用了，而且数据库也就是一个文件也是可以随身携带的
+
+如果不喜欢二进制文件也可以将数据转成文本，命令如下：
+
+<tm lang="shell">
+sqlite3 dbfile.sqlite3 ".dump" > sqlite3db.sql
+</tm>
+
+不过我倒是没有试过在生产环境中使用它，平时在开发与测试时才使用，因此需要将一些mysql中的数据导入到我本地的sqlite3中
+
+自然是先google之，看到一个比较直白的"解决方案":solution 它使用mysqldump导出sql语句并从中仅grep(提取)出insert语句，然后在使用
+<tm lang="shell">
+rake db:create
+rake db:migrate
+</tm>
+之后用
+<tm lang="shell">
+sqlite3 dbfile.sqlite3 < backup.sql
+</tm>
+将数据导入到sqlite3中
+
+不过其中有一点小问题：正如文中所说，mysql与sqlite3的转义符并不一致，<code>除了需要将\'转成''(两个单引号)之外，还需要将"\r"(0x5c0x72)与"\n"(0x5c0x6e)转成\r(0x0d)\n(0x0a)，此外\"也是需要转成"(双引号)的</code>
+
+并且文中的替换方法是使用编辑器手工替换的，这点与我懒惰的习惯实在是不符，还是用sed来自动化一下吧！最终拼成一个脚本如下：
+
+<tm lang="shell">
+#!/bin/sh
+mysqldump  --opt --no-create-db --no-create-info --default-character-set=utf8 --extended-insert=0 -u user -ppassword database \
+| grep 'INSERT' \
+| sed -e "s/\\\'/''/g" -e "s/\\\r/\r/g" -e "s/\\\n/\n/g" -e 's/\\\"/"/g' > backup.sql
+</tm>
+
+如果你需要每天将服务器上的数据备份并应用在日常的开发中的话，可以参考上次所写的"DreamHost每日mysql数据库备份方案":prepost 将上面这段合并到"Dreamhost":dreamhost 的cron任务中
+
+[solution]http://www.dangarland.co.uk/2008/09/27/exporting-mysql-data-into-sqlite3/
+[prepost]/2009/1/24/daily_backup_dreamhost_mysql_database_to_gmail
+[dreamhost]http://www.dreamhost.com/r.cgi?282910
+

@@ -1,0 +1,56 @@
+--- 
+layout: post
+title: 在DreamHost上安装Ruby、Gems与Rails的最简单方法
+disqus_id: /2008/5/9/the_simplest_way_install_ruby_gems_rails_on_dreamhost
+categories: 
+  []
+---
+
+
+其实这篇帖子是一年前就应该写的，当时在"DreamHost":http://dreamhost.com 上折腾了几天才搞定mephisto，花了两周才搞定depot例子加上gettext汉化的过程。不过人总是好了伤疤忘了痛，而且事后想想也觉得没有什么可说，就不了了之了。而且如今DreamHost也开始进行mod_rails的beta测试了，想来现在才写是有点不太合时宜噢。不过最近又在DreamHost上部署了几个rails应用，不免有也心烦，于是有了旧事重提，朝花夕拾一下的想法。
+
+不过有一点要声明就是，其实在DreamHost上安装自己的gems其实是并不需要自己安装Ruby的，这两个过程是可以分开的，不过可能是我变态，总喜新厌旧，而且又狂有控制欲，那么大的空间为什么不装一个，而且还可以为ruby打上GC的补丁呢(其实也就是一想，补丁嘛我也没有打过:P，因为现在还用不上的)。
+
+Ruby装起来很简单，wget一个，解包，编译，安装，将之放入你的路径中就好，不过最好是先编译一份readline为好，以免以后执行script/console会出错，这个不多说，能google出一堆。
+
+Gems嘛，则需要你建一个本地的安装目录，通常为.gems，并告诉gems知道这个目录的存在，为了这一点你就需要有~目录下生成一个.gemrc的文件，并将你的目录告诉它就好了。当然你也可以如我一样，编译一份最新的rubygems，并将之放入你的查找路径之中就好。
+
+然后你还需要修改rails的disptch.fcgi文件，让它知道你的ruby与gems目录所在就好。当然其实你也可以使用"GemsOnRails":http://gemsonrails.rubyforge.org/ 将所有用到的gems放在vendor下，这个就自然不需要自己安装Gems了(rmagick之类的除外)。
+
+好了，言归正传吧，何以言之我的方法最简单呢？其实是受了"tobi":tobi 的启发，将所有的安装命令写成一个脚本然后直接执行它就好。不过与他不同的一点是，我在脚本上增加了GEM_HOME与PATH之类的添加与.gemrc文件的生成，真的是一站式搞定。如果你不太懂linux，那你有福了，当然如果你是linux高手，那就让我怡笑大方吧:(   
+
+其实这条命令就是
+
+<pre>
+<code>
+curl http://leeseon.com/private/allinstall.sh | sh
+</code>
+</pre>
+
+而已，还算简单吧，嘿嘿
+
+不过在这之后你的dispatch.fcgi文件还需要将第一行改成,(dispatch.rb也最好改一下,虽然我发现不改也行)
+
+<pre>
+<code>
+#!/home/your user name/local/bin/ruby
+</code>
+</pre>
+
+并在require语名之前加上
+
+<pre>
+<code>
+ENV['RAILS_ENV'] = 'production'
+ENV["GEM_HOME"]="/home/your user name/.gems"
+ENV["GEM_PATH"]="/home/your user name/.gems:/usr/lib/ruby/gems/1.8"
+</code>
+</pre>
+
+OK,万事搞定，试试吧!
+
+注:我安装的是现在最新版本的ruby-1.8.6-p114与rubygems-1.1.1
+这个以后会不定时的更新为最新版本
+
+ [tobi]http://blog.leetsoft.com/2005/06/17/installing-rails-made-easy
+

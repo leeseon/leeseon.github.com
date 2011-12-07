@@ -1,0 +1,42 @@
+--- 
+layout: post
+title: DreamHost每日mysql数据库备份方案
+disqus_id: /2009/1/24/daily_backup_dreamhost_mysql_database_to_gmail
+categories: 
+  []
+---
+
+
+因为"DreamHost":dreamhost 本身就提供了数据库的备份功能，尤其是象我这样更新不多blog数据也不多:( 一般出了问题restore一下就行了。
+
+不过前几天我犯了一个相当低级的错误，执行了一次
+<pre><code>rake db:reset</code></pre>
+
+谁知"DreamHost":dreamhost 居然只能在命令行中执行
+<pre><code>drop database</code></pre>
+却不能执行
+<pre><code>create database</code></pre>
+
+再去找panel里的数据库还在，但是restore居然提示没有任何内容，也不知出了什么事，只好发邮件问support.,但是网页总不能总是空的啊，好在幸好前几天为"移植一个WordPress下的theme":port_theme 导了一份数据出来，换了个数据改了database.yml就搞定了
+
+只好亡羊补牢google了一下，自然是有现成的方案的，只是因为我想使用gmail来作为接受邮箱，但是gmail会拒收tar.gz, zip之类的文件，我修改了一下使用rar来打包，脚本如下：
+
+<tm lang="shell">
+#!/bin/bash
+cd /home/yourname/backups/ 
+mkdir mysql 
+suffix=$(date +%y%m%d)
+mysqldump --opt --default-character-set=utf8 -uyourname -ppassword -h yourhost.com database | sed "s/\\\'/''/g" > mysql/database.$suffix.sql
+rar a archives/mysql_backup.$suffix.rar -r mysql/*
+rm -r mysql/
+mutt youname@gmail.com -a /home/yourname/backups/archives/mysql_backup.$suffix.rar -s "MySQL Backup"
+</tm>
+
+其中，mysqldump之后需要加上 --default-character-set=utf8 而且再一个sed "s/\\\'/''/g" 通道比较好，这样导出的文件会将\'替成"看起来比较方便
+
+
+
+[dreamhost]http://www.dreamhost.com/r.cgi?282910
+
+[port_theme]http://leeseon.com/2009/1/2/port_inove_wordpress_theme_to_mephisto
+

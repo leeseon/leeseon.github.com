@@ -1,0 +1,55 @@
+--- 
+layout: post
+title: 邮件发送提示成功，但是无法接收
+disqus_id: /2009/4/24/email_send_successed_but_never_get_it
+categories: 
+  []
+---
+
+
+自己写了一段发送邮件的客户端程序，一直运行良好。可是某天开始，程序发送能提示成功，但是一直接收不到，深感诧异。将笔记本带回家中，程序又运行良好。第二天上班，发现问题依旧。 
+
+随决定使用最原始的telnet命令查看问题原因，命令如下
+
+<tm lang="shell">
+16:52:22 [rx] 220 XXX.com ESMTP(EQManager V6.0) ESMTP
+16:52:22 [tx] EHLO computer1
+16:52:22 [rx] 250-XXX.com ESMTP(EQManager V6.0)
+16:52:22 [rx] 250-STARTTLS
+16:52:22 [rx] 250-AUTH LOGIN PLAIN
+16:52:22 [rx] 250-AUTH=LOGIN PLAIN
+16:52:22 [rx] 250-PIPELINING
+16:52:22 [rx] 250-SIZE 25530692
+16:52:22 [rx] 250 8BITMIME
+16:52:22 [tx] AUTH LOGIN
+16:52:22 [rx] 334 VXNlcm5hbWU6
+16:52:22 [tx] e===========
+16:52:22 [rx] 334 UGFzc3dvcmQ6
+16:52:22 [tx] N===========
+16:52:22 [rx] 235 ok, go ahead (#2.0.0)
+16:52:22 [tx] MAIL FROM: <account@XXX.com>
+16:52:22 [rx] 250 ok
+16:52:22 [tx] RCPT TO: <account@sina.com>
+16:52:22 [rx] 250 ok
+16:52:22 [tx] DATA
+16:52:22 [rx] 354 Send from Rising mail proxy
+16:52:22 [tx] 
+.
+</tm>
+
+执行完DATA命令，发送结束符，然后等待从服务器的信息，等待足够长的时间后，系统提示超时。
+邮件一直发送不成功。看到DATA命令紧跟着 Send from Rising mail proxy，猜测可能与瑞星
+防毒软件有关，之后关闭了瑞星，再次发送，ok，一切正常，所有命令没有任何问题。DATA命令
+也能返回响应，但是登录sina还是接受不到。考虑到网络延时，又等待了20分钟，还是接受不到。
+至此黔驴技穷，无计可施了。遂放弃，回家休息了。
+
+第二日上班后，登录sina，一下接收了n多封信，至此我的问题解决。
+
+究其原因
+1.确实是瑞星杀毒软件导致邮件接收不到。因为安装的是网络版，所以回家就关闭了瑞星，到公司
+才打开，解释了为什么在家可以发送成功，而在公司不成功。
+2.sina信箱使用的是免费信箱，上网查找，发现不止我一人，很多使用sina免费信箱的用户都抱怨
+邮件接收延时大，夸张的需要隔一天才可以接收到，可能和他的服务器繁忙有关，当然也可能是不重视
+免费的用户。
+
+

@@ -1,0 +1,191 @@
+--- 
+layout: post
+title: 使用Capistrano在Dreamhost上部署mod_rails
+disqus_id: /2008/5/19/capistrino-on-dreamhost-with-mod_rails
+categories: 
+  []
+---
+
+
+<p>虽然以前<a href="http://capify.org/">Capistrno</a> 在windows下不能使用，但是自从2.0以后，其实就是可以使用的了。而且现在的2.3还加入了对git的支持。</p>
+
+
+	<p>而且从<a href="http://www.infoq.com/cn/news/2008/05/rails-deployment-roundup">InfoQ</a> 上得知<a href="http://tomcopeland.blogs.com/juniordeveloper/2008/05/mod_rails-and-c.html">Tom Copeland</a> 已经使用Capistrano来更新mod_rails了,的确如它所说，只是给这个应用程序建立了一个“restart.txt”文件，就会导致Passenger Phusion/mod_rails重启这个应用程序。的确很简单明了不是吗？</p>
+
+
+	<p>最终的deploy.rb文件看起来会象下面这样</p>
+
+<div class="jssc">
+  <ul style="margin-left: 39px;">
+    <li class="alt">
+      <div>
+        
+set&nbsp;:scm,&nbsp;:subversion      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:repository,&nbsp;        <span class="cstring">
+&quot;http://yoursvn/trunk&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+set&nbsp;:svn_username,&nbsp;        <span class="cstring">
+&quot;svnuser&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:svn_password,&nbsp;        <span class="cstring">
+&quot;svnpassword&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div style="background-color: rgb(255, 255, 153);">
+        
+role&nbsp;:app,&nbsp;        <span class="cstring">
+&quot;www.yourdomain.com&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+role&nbsp;:web,&nbsp;        <span class="cstring">
+&quot;www.yourdomain.com&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+role&nbsp;:db,&nbsp;&nbsp;        <span class="cstring">
+&quot;www.yourdomain.com&quot;        </span>
+,&nbsp;:primary&nbsp;=&gt;&nbsp;        <span class="ckeywords">
+true        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:deploy_to,&nbsp;        <span class="cstring">
+&quot;/home/yourusername/&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+set&nbsp;:user,&nbsp;        <span class="cstring">
+&quot;yourusername&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:password,&nbsp;        <span class="cstring">
+&quot;yourpassword&quot;        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+set&nbsp;:use_sudo,&nbsp;        <span class="ckeywords">
+false        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+namespace&nbsp;:deploy&nbsp;        <span class="ckeywords">
+do        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;desc&nbsp;        <span class="cstring">
+&quot;restarting&nbsp;mod_rails&nbsp;with&nbsp;restart.txt&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;task&nbsp;:restart,&nbsp;:roles&nbsp;=&gt;&nbsp;:app,&nbsp;:except&nbsp;=&gt;&nbsp;{&nbsp;:no_release&nbsp;=&gt;&nbsp;        <span class="ckeywords">
+true        </span>
+&nbsp;}&nbsp;        <span class="ckeywords">
+do        </span>
+      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;&nbsp;&nbsp;run&nbsp;        <span class="cstring">
+&quot;touch&nbsp;#{current_path}/tmp/restart.txt&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;end      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;[:start,&nbsp;:stop].each&nbsp;        <span class="ckeywords">
+do        </span>
+&nbsp;|t|      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;&nbsp;&nbsp;desc&nbsp;        <span class="cstring">
+&quot;#{t}&nbsp;task&nbsp;is&nbsp;a&nbsp;no-op&nbsp;with&nbsp;mod_rails&quot;        </span>
+      </div>
+    </li>
+    <li>
+      <div>
+        
+&nbsp;&nbsp;&nbsp;&nbsp;task&nbsp;t,&nbsp;:roles&nbsp;=&gt;&nbsp;:app&nbsp;        <span class="ckeywords">
+do        </span>
+&nbsp;;&nbsp;end      </div>
+    </li>
+    <li class="alt">
+      <div>
+        
+&nbsp;&nbsp;end      </div>
+    </li>
+    <li>
+      <div>
+        
+end      </div>
+    </li>
+  </ul>
+</div>
+
+

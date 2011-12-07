@@ -1,0 +1,17 @@
+--- 
+layout: post
+title: 自己移植了一个比较喜欢的wordpress主题用用
+disqus_id: /2009/1/2/port_inove_wordpress_theme_to_mephisto
+categories: 
+  []
+---
+
+
+一直垂涎于Wordpress有很多好看的theme可以用，mephisto这两年的更新与发展也太慢了，看来rails的blog系统，相对于PHP来说还真的有一些小众的感觉。
+
+等着别人port我看基本是没戏，自己动手吧，虽然不难，但是有一点啰嗦，加上我的CSS知识也很一般，好在做port这种事其实与CSS基本无关，对于mephisto来说，其实要了解的主要是liquid与mephisto自己的一点变量而已。
+
+截了以前的样子，留个记录吧
+
+<a href="http://www.slide.com/s/Zm5xneBv1z8bWbV7FtDfAKCYPCJl5_u0?referrer=hlnk"><img src="http://widget.slide.com/rdr/1/1/1/W/250000000c9da7f3/1/231/z_ZiBIoh6T-vmw_b8qKm1ZZWrx3ijB2n.jpg" alt="免费无限存放图片在slide.com!" title="免费无限存放图片在slide.com!" /></a>
+

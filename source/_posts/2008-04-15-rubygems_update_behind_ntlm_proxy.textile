@@ -1,0 +1,26 @@
+--- 
+layout: post
+title: NT域内网中的gems更新
+disqus_id: /2008/4/15/rubygems_update_behind_ntlm_proxy
+categories: 
+  []
+---
+
+
+如果你如我一样，不是在一家以纯Mac或Linux/Unix环境下的公司上班，而且很不幸通过在基于NT域之上的代理上网的话，你就可能遇到gem更新的问题
+
+虽然你总可以通过浏览器下载所有的gem然后一个一个的手动安装，但不管怎样，这都是一个很没有效率的事，不是吗？
+
+当然，你自然是可以找到RubyGems上的FAQ中的"提示":http://www.rubygems.org/read/chapter/15#page67 通过一个基于python的称之为APServer的工具再建一个Basic authentication代理，然后基于它搞定这一切。
+
+可惜的是，你可能会遇到如我一般的问题，"http://apserver.sf.net":http://apserver.sf.net 不能打开，你现在只能看到一堆无用的错误提示，晕死:(
+
+不过幸好我经过一番不懈的努力(本来想寻找其它的解决方案)，居然发现了另一个url是指向同一个工程的："http://ntlmaps.sourceforge.net/":http://ntlmaps.sourceforge.net/ 两者只是名字不同而已:)
+
+不过更有趣的事自然是在后头，有人更进一步的通过APServer与Tor及SocksCap32组建了一个完整的上网环境，使得在办公室里使用emule都成为了可能，呵呵，有兴趣的可以看一下"这里":here
+
+[here]http://superding.spaces.live.com/blog/cns!89E842A8485366C7!513.entry?wa=wsignin1.0
+
+不过一般我是不会在办公室里使用emule的，毕竟这种lowID是比较慢的，不过知道有这种可能也是不错的
+
+

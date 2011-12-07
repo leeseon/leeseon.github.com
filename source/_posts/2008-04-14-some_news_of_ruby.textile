@@ -1,0 +1,21 @@
+--- 
+layout: post
+title: 最近ruby二三事
+disqus_id: /2008/4/14/some_news_of_ruby
+categories: 
+  []
+---
+
+
+最近这两周，ruby社区接连有几件大事发生:
+
+当仁不让最火爆的自然是"GitHub":http://github.com/ 的正式上线，DHH称之为一个"killer application".
+
+此外，就因为是这两天众望所归的"mod_rails":http://www.modrails.com/ 的realse. 虽然robbin对它在VPS上的前景"不太看好":http://robbin.javaeye.com/blog/182312 ，但是在dreamhost之类的共享主机上倒是前途远大，而且apache老矣的诊断我还觉得有点为时过早。
+
+与这两件相比JRuby1.1与HotRuby 及RubyJS之类的新闻都不那么让人激动了。
+
+总得来说，ruby现在越来越开始走向工业化的前端了，rails与git的结合让我看到一个新的开源社区的前景。mod_rails则开始着手于，一开始让人诟病的rails的部署不如PHP简单明了的问题。而且现在的ruby也越来越VM化了。
+
+PS：今天有点头痛，词不达意，先下，再写
+

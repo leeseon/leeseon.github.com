@@ -1,0 +1,96 @@
+--- 
+layout: post
+title: 更新了一下脚本
+disqus_id: /2008/7/6/new_dreamhost_ruby_and_rails_shell
+categories: 
+  []
+---
+
+
+自从"上回":post 之后，ruby、rails与gems也都开始更新了，于是也更新了一下安装脚本，如下：
+
+<div class="jssc"><ul style="margin-left: 39px;"><li class="alt"><div>mkdir ~/.gems
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><div>echo <span class="cchar">'export GEM_HOME="$HOME/.gems"'</span> &gt;&gt; .bash_profile
+</div></li><li class="alt"><div>echo <span class="cchar">'export GEM_PATH="$GEM_HOME:/usr/lib/ruby/gems/1.8"'</span> &gt;&gt; .bash_profile
+</div></li><li class="alt"><div>echo <span class="cchar">'export PATH="$HOME/.gems/bin:$PATH"'</span> &gt;&gt; .bash_profile
+</div></li><li class="alt"><div>echo <span class="cchar">'export PATH="$HOME/local/bin:$PATH"'</span> &gt;&gt; .bash_profile
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><div>. ~/.bash_profile
+</div></li><li class="alt"><div>echo $PATH
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><div>touch ~/.gemrc
+</div></li><li class="alt"><div>echo gemhome:/home/$(whoami)/.gems &gt;&gt; ~/.gemrc
+</div></li><li class="alt"><div>echo gempath: &gt;&gt; ~/.gemrc
+</div></li><li class="alt"><div>echo -/home/$(whoami)/.gems &gt;&gt; ~/.gemrc
+</div></li><li class="alt"><div>echo -/usr/lib/ruby/gems/1.8 &gt;&gt; ~/.gemrc
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><span class="ccomment"># setup directories
+</span></li><li class="alt"><div>mkdir -p ~/local/usr/src/ruby
+</div></li><li class="alt"><div>cd ~/local/usr/src/ruby
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><span class="ccomment"># Install readline
+</span></li><li class="alt">wget <span class="htmlstring">ftp://ftp.cwru.edu/pub/bash/readline-5.2.tar.gz</span>
+</li><li class="alt"><div>tar zxvf readline-5.2.tar.gz
+</div></li><li class="alt"><div>cd readline-5.2
+</div></li><li class="alt"><div>./configure --prefix=$HOME/local
+</div></li><li class="alt"><div>make
+</div></li><li class="alt"><div>make install
+</div></li><li class="alt"><div>cd ..
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><span class="ccomment"># install ruby
+</span></li><li class="alt">wget <span class="htmlstring">ftp://ftp.ruby-lang.org/pub/ruby/1.8/ruby-1.8.7-p22.tar.bz2</span>
+</li><li class="alt"><div>tar jxvf ruby-1.8.7-p22.tar.bz2
+</div></li><li class="alt"><div>cd ruby-1.8.7-p22
+</div></li><li class="alt"><div>./configure --prefix=$HOME/local --with-readline-dir=$HOME/local/
+</div></li><li class="alt"><div>make
+</div></li><li class="alt"><div>make install
+</div></li><li class="alt"><div>cd ..
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><span class="ccomment"># fix path
+</span></li><li class="alt"><div>export PATH=$HOME/local/bin:$PATH
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><span class="ccomment"># get rubygems
+</span></li><li class="alt">wget <span class="htmlstring">http://rubyforge.org/frs/download.php/38646/rubygems-1.2.0.tgz</span>
+</li><li class="alt"><div>tar zxvf rubygems-1.2.0.tgz
+</div></li><li class="alt"><div>cd rubygems-1.2.0
+</div></li><li class="alt"><div>$HOME/local/bin/ruby setup.rb config --prefix=$HOME/local
+</div></li><li class="alt"><div>$HOME/local/bin/ruby setup.rb setup
+</div></li><li class="alt"><div>$HOME/local/bin/ruby setup.rb install
+</div></li><li class="alt"><div>cd ..
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><span class="ccomment"># Install RAILS
+</span></li><li class="alt"><div>gem install rails
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><span class="ccomment"># Install FastCGI
+</span></li><li class="alt">curl -O <span class="htmlstring">http://www.fastcgi.com/dist/fcgi-2.4.0.tar.gz</span>
+</li><li class="alt"><div>tar xzvf fcgi-2.4.0.tar.gz
+</div></li><li class="alt"><div>cd fcgi-2.4.0
+</div></li><li class="alt"><div>./configure --prefix=$HOME/local
+</div></li><li class="alt"><div>make
+</div></li><li class="alt"><div>make install
+</div></li><li class="alt"><div>cd ..
+</div></li><li class="alt"><div>
+</div></li><li class="alt"><span class="ccomment"># Install FastCGI &amp; MySQL gem packages
+</span></li><li class="alt"><div>gem install fcgi -- --with-fcgi-dir=$HOME/local
+</div></li><li class="alt"><div>gem install mysql -- --with-mysql-config
+</div></li><li class="alt"><span class="ccomment"># gem  update</span></li></ul></div>
+
+关于脚本的解释可以看"以前":post2 的说明，这次仅仅只是版本上的更新而已，不再多做说明
+
+文件依然放在"http://leeseon.com/private/allinstall.sh":shell 处
+
+也同样可以使用
+
+<pre>
+<code>
+curl http://leeseon.com/private/allinstall.sh | sh
+</code>
+</pre>
+
+来执行，无它、、、
+
+[post]http://leeseon.com/2008/5/9/the_simplest_way_install_ruby_gems_rails_on_dreamhost
+[post2]http://leeseon.com/2008/5/10/the_simplest_way_install_ruby_gems_rails_on_dreamhost_2
+[shell]http://leeseon.com/private/allinstall.sh
+

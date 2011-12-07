@@ -1,0 +1,23 @@
+--- 
+layout: post
+title: 从Textmate到Emacs
+disqus_id: /2008/11/10/from_textmate_to_emacs
+categories: 
+  []
+---
+
+
+虽然Textmate一直是俺的最爱，但是出了ruby及os x之外，使用Textmate有时成了一种奢望，就说rubinius吧，这个<notextile>*nix</notextile> only的项目，现在也没有办法在cgywin上编译通过，在我打过多处补丁之后，发现这几乎对我来说是一项不可能完成的任务。不太懂<notextile>*nix</notextile>下的线程与信号的说，这个以后俺再补补，争取出个windows上原生线程的port。
+
+为了在<notextile>*nix</notextile>（ubuntu与mac os x)下读读它，并跟踪一下它的运行，我只好祭出emacs了，好在它可以整合emacs code browser及cscope，而且还能同时使用图形化的gdb界面。看来Ｃ++还是用emacs好了。
+
+其实我也一直很叶公好龙滴，虽然早就耳闻emacs的好，但是在ubuntu下俺就用gedit来偷懒，dreamhost上用不太熟的vi来混混，windows上还是主要依赖于VS、notepad++，有时也拿intype来找一下textmate的感觉。
+
+最近又因为公司里不许安装Ｄ版，而且VS公司又不肯买，在这点的Jole测试上公司应该是零分的:( 还说是因为印度那边用VC++ Express一直都很好，而且因为金融危机的问题，公司不肯再在软件上投入更多的预算，真是服了公司的目光短浅及印度人的忍耐力、、、、
+
+不过我是被Visual Assist X给宠坏了，不让我使用alt+o, alt+shift+s, alt+shift+o我是没有办法习惯了,而且我曾经花美金买到绝版的ref++及现在refactor!等等的插件都再也办法用了:( 不能装插件的vc express是一个让我无法适应的IDE。
+
+好在emacs还有一个windows的版本，在配完cedet之后，与VAX相同的功能也都回来了，只是emacs下的重构功能我还没有试过，而且那个是要收费滴
+
+经过了几天与emacs的搏斗之后，才发现emacs的难学只是听起来吓人的，慢慢的，还不等你记住，你的手指也开始记住了它的习惯了。而且使用它与<notextile>*nix</notextile>下的工具合作起来真的是很爽的，而且这样你在三个平台之下都有了一个统一的IDE感觉真的很爽，不过不知为什么，我居然没有想过用eclipse与netbean呢？我也不知道，可能我天生爱受虐，或者喜欢虐键盘，总对用quicksilver与launchy调出一个emacs疯狂打上一些古怪组合键感觉良好。不知你是否有同好？呵呵
+

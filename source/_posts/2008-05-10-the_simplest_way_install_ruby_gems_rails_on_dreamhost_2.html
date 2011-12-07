@@ -1,0 +1,309 @@
+--- 
+layout: post
+title: 在DreamHost上安装Ruby、Gems与Rails的最简单方法之续
+disqus_id: /2008/5/10/the_simplest_way_install_ruby_gems_rails_on_dreamhost_2
+categories: 
+  []
+---
+
+
+        <p>昨天只是泛泛谈了一下<a href="http://leeseon.com/2008/5/9/the_simplest_way_install_ruby_gems_rails_on_dreamhost">在DreamHost上安装Ruby、Gems与Rails的最简单方法</a> 似乎有点 意犹未尽，决定写个续集，呵呵:)</p>
+
+
+	<p>好吧从哪儿说起呢？嗯，看我注释过的脚本吧，注释应该已经算是说得比较明白了，无它!</p>
+
+<div class="jssc">
+		<ul style="margin-left: 39px;">
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				<span class="ccomment">#修改.bash_profile，设置环境变量GEM_HOME与GEM_PATH
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				<span class="ccomment">#并将~/.gems/bin与~/local/bin加入到查找路径的前端 
+				</span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo&nbsp; <span class="cchar">&#39;export GEM_HOME=&quot;$HOME/.gems&quot;&#39;
+				</span>&nbsp;&gt;&gt; .bash_profile </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo&nbsp; <span class="cchar">&#39;export GEM_PATH=&quot;$GEM_HOME:/usr/lib/ruby/gems/1.8&quot;&#39;
+				</span>&nbsp;&gt;&gt; .bash_profile </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo&nbsp; <span class="cchar">&#39;export PATH=&quot;$HOME/.gems/bin:$PATH&quot;&#39;
+				</span>&nbsp;&gt;&gt; .bash_profile </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo&nbsp; <span class="cchar">&#39;export PATH=&quot;$HOME/local/bin:$PATH&quot;&#39;
+				</span>&nbsp;&gt;&gt; .bash_profile </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				<span class="ccomment">#执行.bash_profile使变量生效 </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				. ~/.bash_profile </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment">#显示PATH变量，仅仅只是为了测试 </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo $PATH </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				<span class="ccomment">#生成gems所需的目录及.gemrc文件，并填充相应内容 </span>
+			</div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				mkdir ~/.gems </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				touch ~/.gemrc </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo gemhome:/home/$(whoami)/.gems &gt;&gt; ~/.gemrc </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo gempath: &gt;&gt; ~/.gemrc </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo -/home/$(whoami)/.gems &gt;&gt; ~/.gemrc </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;" style="background-color: transparent;">
+				echo -/usr/lib/ruby/gems/1.8&nbsp;&gt;&gt; ~/.gemrc </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># setup directories </span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				mkdir -p ~/local/usr/src/ruby </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd ~/local/usr/src/ruby </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># Install readline </span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				wget <span class="htmlstring">ftp://ftp.cwru.edu/pub/bash/readline-5.2.tar.gz
+				</span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				tar zxvf readline-5<span></span>.2.tar.gz </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd readline-5.2</div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				./configure --prefix=$HOME/local </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make install </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd .. </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># install ruby </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				wget  <span class="htmlstring">ftp://ftp.ruby-lang.org/pub/ruby/1.8/ruby-1.8.6-p114.tar.gz
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				tar zxvf ruby-1.8.6-p114.tar.gz </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd ruby-1.8.6-p114 </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				./configure --prefix=$HOME/local --with-readline-dir=$HOME/local/
+			</div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make install </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd .. </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># fix path </span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				export PATH=$HOME/local/bin:$PATH </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># get rubygems </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				wget  <span class="htmlstring">http://rubyforge.org/frs/download.php/35283/rubygems-1.1.1.tgz
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				tar zxvf rubygems- 1.1.1.tgz
+			</div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd rubygems-1.1.1</div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				$HOME/local/bin/ruby setup.rb config --prefix=$HOME/local </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				$HOME/local/bin/ruby setup.rb setup </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				$HOME/local/bin/ruby setup.rb install </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd .. </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># Install RAILS </span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				gem install rails </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># Install FastCGI </span></div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				curl -O <span class="htmlstring">http://www.fastcgi.com/dist/fcgi-2.4.0.tar.gz
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				tar xzvf fcgi-2.4.0.tar.gz </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd fcgi-2.4.0</div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				./configure --prefix=$HOME/local </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				make install </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				cd .. </div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+&nbsp;&nbsp; </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				<span class="ccomment"># Install FastCGI &amp; MySQL gem packages
+				</span></div>
+			</li>
+			<li>
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				gem install fcgi -- --with-fcgi-dir=$HOME/local </div>
+			</li>
+			<li class="alt">
+			<div onmouseout="this.style.backgroundColor=&quot;transparent&quot;" onmouseover="this.style.backgroundColor=&quot;#ff9&quot;">
+				gem install mysql -- --with-mysql-config </div>
+			</li>
+		</ul>
+	</div>
+

@@ -1,0 +1,42 @@
+--- 
+layout: post
+title: mephisto0.8出错了:(
+disqus_id: /2008/9/6/mephisto0-8_error_maybe_from_edge_rails
+categories: 
+  []
+---
+
+
+<p>好久没有写blog了，最近才发现游戏公司忙起来还真的不是一般的忙，现在对那著名的“对EA的血泪控诉”也开始是感同身受了啊，唉!</p>
+
+
+<p>好在最近闲下来了一点，而且发现自己的gmail里面堆满了从dreamhost发过来的Cron Daemon的错误提示，提示我mephisto的/admin出错了。</p>
+
+
+<p>本来没有当回事，估计是因为dreamhost的rails升级到2.1.0引起的，当时我使用mephisto0.8，因为正好系统中有rails 2.0.2一时偷懒没有将rails freeze起来，心想应该freeze一下就没有问题了。二话不说，开工，运行</p>
+<pre>
+<code>
+rake rails:freeze:gems VERSION=2.0.2
+</code>
+</pre>
+<p>本以为重启一下服务就能好了，谁知出了一堆错，提示我 &#8220;undefined method &#8216;install_gem_spec_stubs&#8217;&#8221;</p>
+
+<p>查了一下文档，不对啊，install_gem_spec_stubs可是rails2.1.0中的函数啊，怎么会出现在mephisto 0.8之中，怪啊，不过即然如此，拿2.0.2试试便知，运行</p>
+<pre>
+<code>
+rails _2.0.2_ testrails
+</code>
+</pre>
+<p>打开config/boot.rb看了看，根本不用比较工具就能发现mephisto0.8的文件中的确是多出一行，注掉即可</p>
+
+<pre class="blackboard">  <span class="Keyword">class</span> <span class="Entity">VendorBoot<span class="Superclass"> <span class="Superclass">&lt;</span> Boot</span></span>
+    <span class="Keyword">def</span> <span class="Entity">load_initializer</span>
+      <span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span><span class="String"><span class="String">#{</span><span class="Variable">RAILS_ROOT</span><span class="String">}</span></span>/vendor/rails/railties/lib/initializer<span class="String">&quot;</span></span>
+<span class="Comment">      <span class="Comment">#</span>Rails::Initializer.run(:install_gem_spec_stubs)</span>
+    <span class="Keyword">end</span>
+  <span class="Keyword">end</span>
+</pre>
+
+<p>想想，可能是因为使用edge rails来生成的mephisto 0.8的原始文件的吧</p>
+
+

@@ -1,0 +1,43 @@
+--- 
+layout: post
+title: ByeBye Dreamhost
+disqus_id: /2010/1/16/bye_bye_dreamhost
+categories: 
+  []
+---
+
+
+因为"Site5":site5 还为从其它主机转过来的用户提供了一份更多的优惠，你只需要能证明自己是从其它的主机转过来并且已经关闭了以前的帐号，你就能得到$25的“回扣”用于下一次的任何购买中。不过这份回扣是需要在购买"Site5":site5 的30天内申请的。反正我的域名已经全部转到了"godaddy":http://godaddy.com 网站也全迁过来了，虽然离真正到期还有一个多月，但是close掉在"Dreamhost":dh 上的帐号自己是不二之选了。关闭帐号是很简单的，只要点击close然后再确认再输入密码就行了。在最后提示我因为我的费用并没有用完，下次如果还决定回"Dreamhost":dh 的话，那笔钱还是可以作为折扣从我的价格中减去的。很公平不是吗？可惜我是真的不太准备回去了。
+
+好吧，不管怎样我已经使用了"Dreamhost":dh 快三年了，说一说我的感受吧，可能对后来者能一点帮助，也算是一点经验或者是总结。
+
+其实根据VPSer的"介绍":introduce "Dreamhost":dh 自建的机房位于洛杉矶,网速其实是很快的(这个我们下面会讨论的)，而"Site5":site5 是使用著名的"The Planet":http://www.theplanet.com/ 机房速度也不慢，不过从我的(北京联通)测试上来看还是稍慢于"Dreamhost":dh 一点点。不过我这儿谈的网速仅仅是指传输层的速度，但是真实的用户体验是"Site5":site5 的速度大于"Dreamhost":dh 的，这个是得到多方(监控宝与google analytics)证实的。
+
+为什么会是这样？我们可以先看几张我从"监控宝":http://www.jiankongbao.com/ 上获取的几张图
+
+第一张是在"Dreamhost":dh 上较快的HTTP响应时间分布
+!http://leeseon.com/assets/leeseon.com/2010/1/16/chart3.jpeg!
+
+第二张是在"Dreamhost":dh 上转慢的HTTP响应时间分布
+!http://leeseon.com/assets/leeseon.com/2010/1/16/chart2.jpeg!
+
+第三张是在"Dreamhost":dh 上最慢的HTTP响应时间分布
+!http://leeseon.com/assets/leeseon.com/2010/1/16/chart.jpeg!
+
+第四张是在"Site5":site5 上平均的HTTP响应时间分布
+!http://leeseon.com/assets/leeseon.com/2010/1/16/chart4.jpeg!
+
+第五张是在"Site5":site5 上较慢的HTTP响应时间分布
+!http://leeseon.com/assets/leeseon.com/2010/1/16/chart5.jpeg!
+
+总体上来说，DNS的解析速度区别并不大，我在监控宝上关于ping值与DNS解析的速度的对比上"Dreamhost":dh 是要优于"Site5":site5 的，不过那个区别在100ms之内，人是感觉不到的。对于网页的下载时间，其实两者区别也不大也在100ms之内，而真正引起感官上的区别的主要是服务器的计算时间的区别，DH有时比S5要慢上太多了，而且有时DH上连建立链接的时间也会很慢，这只能说明DH也太超卖(oversell)了。而"Site5":site5 在这个方面控制的是比较好的吧，起码我现在的平均总的HTTP响应速度在2s左右。
+
+总结一下吧，DH其实还是一个不错的主机，尤其是它第一年的优惠价格太诱人了，而且主机开放ssh权限，这对需要翻墙或者部署rails应用的用户来说还是很不错的。我就是因为它第一年的$24的价格被吸引去的，前不久居然还有过$7.77的第一年的价格优惠。但是第一年之后的价格就比较贵了，而且并不太物有所值了。加上它疯狂的超卖，我的那台主机开始感觉到越来越慢(第一年还好，是最近越来越糟的)，所以你如果只是一个linux或rails的初手，只是想架个Blog或者是部署下rails玩玩，我还是推荐你可以买来玩上一年，别象我似的玩了一年之后因为懒得搬家就一共呆了快三年。除此之外我还是推荐"Site5":site5 作为共享主机的一个不错的选择，当然你要用VPS我还是推荐"Linode":http://www.linode.com 虽然我还没有用过，但是因为有几个我依赖的人的推荐，我相信这个是不错的。
+
+PS:就我个人感觉"监控宝":http://www.jiankongbao.com/ 真的很不错，如果你有一个网站，那你一定要用用它! 关于Site5的购买你可以去"riku":riku 那儿看看
+
+[riku]http://riku.me/2009/03/06/site5.html
+[site5]http://www.site5.com/in.php?id=78968-43
+[introduce]http://www.vpser.net/other/choose-locations-for-ur-hosting.html
+[dh]http://dreamhost.com
+

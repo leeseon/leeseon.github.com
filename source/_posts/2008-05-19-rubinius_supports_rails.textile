@@ -1,0 +1,19 @@
+--- 
+layout: post
+title: Rubinius开始支持rails了
+disqus_id: /2008/5/19/rubinius_supports_rails
+categories: 
+  []
+---
+
+
+不是我不明白，只是这个世界变得快!
+
+最近因为地震的原因，在网上看新闻的时侯比较多，对于ruby的新进展的了解要慢了几拍：
+
+昨天才知道dreamhost已经开始支持mod_rails了，还写下了一篇"酸溜溜的blog":blog
+
+今天也是通过从InfoQ订阅的新闻中得知Rubinius开始支持rails了，好消息啊，这是续它支持gems与merb之后又一重大的里程碑啊，贺之！看来以后新的rails的基于rubinius的host主机很可能会出现了，最有可能的自然是"engineyard":http://engineyard.com/ 了，只是不希望太贵噢，这样我还能试试，不过想来可能性不大:(
+
+[blog]http://leeseon.com/2008/5/18/mod_rails-on-dreamhost
+

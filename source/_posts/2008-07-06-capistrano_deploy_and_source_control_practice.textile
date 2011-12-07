@@ -1,0 +1,37 @@
+--- 
+layout: post
+title: Capistrano配置及版本控制实践
+disqus_id: /2008/7/6/capistrano_deploy_and_source_control_practice
+categories: 
+  []
+---
+
+
+以前一直都将"Capistrano":http://www.capify.org/ 的deploy.rb的文件放在SVN中，最近需要将代码共享给别人一同开发，这才发现了有一个问题，就是我的空间帐号与数据库的密码是不希望让人知道，毕竟知道的人越少越好嘛。
+
+而且最近做了一件傻事，就是以前我都是将
+
+
+<pre>
+<code>
+ENV["GEM_HOME"]="/home/yourusername/.gems" 
+ENV["GEM_PATH"]="/home/yourusername/.gems:/usr/lib/ruby/gems/1.8" 
+</code>
+</pre>
+
+这样的配置放在dispatch.fcgi中，现在因为使用了"Phusion Passenger":http://www.modrails.com/ (mod_rails)之后，这一段的内容放在了config/enviroment.rb之中，所以在windows上运行rake test时，出现了找不到gems的错误，一时没有想到了这样的问题，还费了半天的功夫:(
+
+于是鉴于这些问题，deploy.rb原则上不需要放在版本控制中的，而且database.yml与enviroment.rb也不需要放在版本控制之中，这些文件可以另外保存，与rails代码分开，放在另一个版本控制之中，并且放在share_dir中，在部署时拷贝到相应的目录之中。
+
+想做到这样，只需要在deploy.rb中增加一个任务
+
+  before "deploy:restart", 'deploy:copy_config'
+  desc "Copy the configuration file "
+  task :copy_config, :roles => :app, :except => { :no_release =>  true  }   do
+    run "cp -f #{shared_dir}/environment.rb #{current_path}/config/environment.rb"
+    run "cp -f #{shared_dir}/database.yml #{current_path}/config/database.yml"
+  end
+
+即可
+
+
